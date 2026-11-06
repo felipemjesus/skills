@@ -2,7 +2,7 @@
 
 Skill que torna o repositório **IA first** e conduz as entregas do dev com agentes de código (Claude Code, Codex, Cursor, Copilot) **com qualidade**.
 
-Autor: Felipe M. Jesus ([@felipemjesus](https://github.com/felipemjesus)) · criada para o Desafio Elevate da [Tech Leads Club](https://www.techleads.club) · código em [skills/mine/dev-ai-first](../skills/mine/dev-ai-first)
+Autor: Felipe Martins ([@felipemjesus](https://github.com/felipemjesus)) · criada para o Desafio Elevate da [Tech Leads Club](https://www.techleads.club) · código em [skills/mine/dev-ai-first](../skills/mine/dev-ai-first)
 
 **Demo (4min51, narrada e com legendas):** [youtu.be/E3Ixk_QQfMU](https://youtu.be/E3Ixk_QQfMU). Mostra como a skill surgiu, o uso na prática (preparar um backend legado e entregar uma demanda) e as vantagens.
 

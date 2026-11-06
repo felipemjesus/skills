@@ -4,7 +4,7 @@ description: Torna o repositório IA first e conduz as entregas do dev com agent
 license: MIT
 compatibility: Agentes de código com suporte a Agent Skills (Claude Code, Codex, Cursor). Os scripts usam bash, git e ferramentas POSIX; testados em Linux e macOS.
 metadata:
-  author: Felipe M. Jesus
+  author: Felipe Martins
   github: https://github.com/felipemjesus
   repository: https://github.com/felipemjesus/skills
   version: "1.0.0"

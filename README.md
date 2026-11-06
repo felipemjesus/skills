@@ -1,4 +1,4 @@
-# Felipe M. Jesus · Skills
+# Felipe Martins · Skills
 
 Coleção de **agent skills** para Claude Code e outros agentes de código compatíveis (Codex, Cursor). Cada skill traz conhecimento de domínio, boas práticas e fluxos guiados para o agente executar uma tarefa com qualidade.
 
@@ -90,4 +90,4 @@ Toda skill nova entra em `skills/<grupo>/<nome>/`, com `name` igual ao nome da p
 
 ## Licença
 
-[MIT](LICENSE) © Felipe M. Jesus
+[MIT](LICENSE) © Felipe Martins
