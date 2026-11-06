@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.DS_Store
+.env
+.tmp/
+
+# pastas locais dos agentes e estado de tarefas da dev-ai-first
+.agents/skills
+.claude/skills
+.claude/settings.local.json
+.dev-ai-first/
