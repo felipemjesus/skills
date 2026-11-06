@@ -2,7 +2,7 @@
 
 Skill que torna o repositório **IA first** e conduz as entregas do dev com agentes de código (Claude Code, Codex, Cursor, Copilot) **com qualidade**.
 
-Autor: Felipe Martins ([@felipemjesus](https://github.com/felipemjesus)) · criada para o Desafio Elevate da [Tech Leads Club](https://www.techleads.club) · código em [skills/mine/dev-ai-first](../skills/mine/dev-ai-first)
+Autor: Felipe Martins ([@felipemjesus](https://github.com/felipemjesus)) · criada para o Desafio Elevate da [Tech Leads Club](https://www.techleads.club) · código em [skills/dev-ai-first](../skills/dev-ai-first)
 
 **Demo (4min51, narrada e com legendas):** [youtu.be/E3Ixk_QQfMU](https://youtu.be/E3Ixk_QQfMU). Mostra como a skill surgiu, o uso na prática (preparar um backend legado e entregar uma demanda) e as vantagens.
 
@@ -45,7 +45,7 @@ npx skills add felipemjesus/skills --skill dev-ai-first
 Ou à mão, a partir de um clone deste repositório:
 
 ```bash
-cp -r skills/mine/dev-ai-first ~/.claude/skills/dev-ai-first
+cp -r skills/dev-ai-first ~/.claude/skills/dev-ai-first
 ```
 
 **Exemplos de prompt:**
@@ -67,7 +67,7 @@ Sem a barra, a skill também é acionada por pedidos como "prepara este reposit�
 ## Estrutura
 
 ```
-skills/mine/dev-ai-first/
+skills/dev-ai-first/
 ├── SKILL.md                  # detecta a situação e roteia (curto)
 ├── references/
 │   ├── preparar.md           # entrevista, leitura do código, onde buscar cada marcador, diagnóstico

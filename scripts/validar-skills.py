@@ -1,4 +1,4 @@
-"""Valida as skills de skills/<grupo>/<skill>/ contra a especificação Agent Skills.
+"""Valida as skills de skills/<skill>/ contra a especificação Agent Skills.
 
 Confere o frontmatter do SKILL.md (https://agentskills.io/specification):
 - name: 1 a 64 caracteres, a-z, 0-9 e hífen, sem hífen no início, no fim ou duplo,
@@ -71,9 +71,9 @@ def validar(skill: pathlib.Path) -> list[str]:
 
 def main():
     raiz = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else pathlib.Path(__file__).resolve().parent.parent / "skills"
-    skills = sorted(p.parent for p in raiz.glob("*/*/SKILL.md"))
+    skills = sorted(p.parent for p in raiz.glob("*/SKILL.md"))
     if not skills:
-        sys.exit(f"nenhuma skill encontrada em {raiz}/<grupo>/<skill>/SKILL.md")
+        sys.exit(f"nenhuma skill encontrada em {raiz}/<skill>/SKILL.md")
     erros = [e for s in skills for e in validar(s)]
     for e in erros:
         print(e)

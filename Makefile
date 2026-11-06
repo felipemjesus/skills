@@ -1,10 +1,10 @@
 .DEFAULT_GOAL := help
 
 PYTHON ?= python3
-SKILL_DIRS := $(patsubst %/SKILL.md,%,$(wildcard skills/*/*/SKILL.md))
-SCRIPTS := $(wildcard skills/*/*/scripts/*.sh)
+SKILL_DIRS := $(patsubst %/SKILL.md,%,$(wildcard skills/*/SKILL.md))
+SCRIPTS := $(wildcard skills/*/scripts/*.sh)
 # verificador de links da dev-ai-first, usado para todas as skills do repositório
-VERIFICAR_LINKS := skills/mine/dev-ai-first/scripts/verificar-links.sh
+VERIFICAR_LINKS := skills/dev-ai-first/scripts/verificar-links.sh
 
 .PHONY: help check test verify
 

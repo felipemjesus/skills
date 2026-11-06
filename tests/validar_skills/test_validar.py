@@ -16,7 +16,7 @@ class ValidarSkills(unittest.TestCase):
         shutil.rmtree(self.raiz)
 
     def skill(self, pasta: str, frontmatter: str, corpo: str = "# Skill\n") -> None:
-        destino = self.raiz / "mine" / pasta
+        destino = self.raiz / pasta
         destino.mkdir(parents=True)
         (destino / "SKILL.md").write_text(f"---\n{frontmatter}\n---\n{corpo}", encoding="utf-8")
 

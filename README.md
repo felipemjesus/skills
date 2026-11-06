@@ -26,10 +26,10 @@ Copie ou crie um link simbólico para a pasta de skills do seu agente:
 
 ```bash
 # copiar uma skill
-cp -r skills/mine/dev-ai-first ~/.claude/skills/dev-ai-first
+cp -r skills/dev-ai-first ~/.claude/skills/dev-ai-first
 
 # ou manter atualizada a partir do clone
-ln -s "$(pwd)/skills/mine/dev-ai-first" ~/.claude/skills/dev-ai-first
+ln -s "$(pwd)/skills/dev-ai-first" ~/.claude/skills/dev-ai-first
 ```
 
 ## Uso
@@ -46,7 +46,7 @@ Skills são instruções estruturadas que dão ao agente experiência num domín
 
 ### Minhas ⭐️
 
-#### [dev-ai-first](./skills/mine/dev-ai-first) ⭐️
+#### [dev-ai-first](./skills/dev-ai-first) ⭐️
 
 Torna o repositório **IA first** e conduz as entregas do dev com agentes de código, **com qualidade**.
 
@@ -66,8 +66,7 @@ Demo (4min51, narrada): [youtu.be/E3Ixk_QQfMU](https://youtu.be/E3Ixk_QQfMU) · 
 ```text
 .
 ├── skills/
-│   └── mine/                  # skills originais (⭐️)
-│       └── dev-ai-first/
+│   └── dev-ai-first/          # uma pasta por skill
 ├── scripts/
 │   └── validar-skills.py      # confere o frontmatter de toda skill contra a especificação
 ├── tests/                     # testes dos scripts das skills e do validador
@@ -86,7 +85,7 @@ make test     # roda os testes dos scripts e do validador
 make verify   # check + test, o mesmo que o CI roda
 ```
 
-Toda skill nova entra em `skills/<grupo>/<nome>/`, com `name` igual ao nome da pasta, e precisa passar no `make verify`.
+Toda skill nova entra em `skills/<nome>/`, com `name` igual ao nome da pasta, e precisa passar no `make verify`.
 
 ## Licença
 

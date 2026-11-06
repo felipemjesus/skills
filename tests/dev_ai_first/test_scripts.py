@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 import unittest
 
-SKILL = pathlib.Path(__file__).resolve().parents[2] / "skills" / "mine" / "dev-ai-first"
+SKILL = pathlib.Path(__file__).resolve().parents[2] / "skills" / "dev-ai-first"
 SCRIPTS = SKILL / "scripts"
 
 
