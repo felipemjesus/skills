@@ -1,36 +1,25 @@
-# Runbook: {{nome do alerta ou situação}}
+# Runbook: {{alerta ou situação}}
 
-- **Severidade:** {{SEV1 / SEV2 / SEV3}}
-- **Dono:** {{time}}
-- **Alerta relacionado:** {{nome/link}}
-- **Última revisão:** {{AAAA-MM-DD}}
+- **Severidade:** {{SEV1 / SEV2 / SEV3}} · **Dono:** {{time}} · **Alerta:** {{nome/link}} · **Revisado em:** {{AAAA-MM-DD}}
 
-## Sintoma
+## Sintoma e impacto
 
-{{O que se observa: alerta, reclamação, métrica.}}
-
-## Impacto
-
-{{Quem é afetado e como.}}
+{{O que se observa (alerta, reclamação, métrica) e quem é afetado.}}
 
 ## Diagnóstico
 
-1. {{Verificar dashboard X: link}}
-2. {{Consultar logs/traces com filtro Y}}
-3. {{Possíveis causas e como distinguir entre elas}}
+1. {{Dashboard: link}}
+2. {{Logs/traces com o filtro}}
+3. {{Causas possíveis e como distinguir}}
 
 ## Mitigação
 
 | Causa | Ação imediata |
 |---|---|
-| {{ex.: fila acumulando jobs}} | {{verificar se o worker de fila está rodando; reiniciar; checar jobs falhos e conexão com a fila}} |
-| {{ex.: DLQ crescendo}} | {{inspecionar mensagens; corrigir consumidor; reprocessar}} |
+| {{ex.: taxa de erro subiu logo após um deploy}} | {{comparar com a versão anterior; rollback se confirmado}} |
 
 ## Escalonamento
 
 {{Quem acionar e quando.}}
 
-## Depois do incidente
-
-- Postmortem sem culpados se SEV1/SEV2.
-- Atualizar este runbook com o que se aprendeu.
+Depois do incidente: postmortem sem culpados (SEV1/SEV2) e este runbook atualizado.

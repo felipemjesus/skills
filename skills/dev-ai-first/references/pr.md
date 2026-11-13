@@ -1,4 +1,4 @@
-# Descrição do PR
+# Descrição do PR (ou MR)
 
 Objetivo: uma descrição que o revisor humano confere contra o diff sem precisar perguntar nada. Toda afirmação dela é verificável no diff ou na saída de um comando.
 
@@ -6,7 +6,7 @@ Objetivo: uma descrição que o revisor humano confere contra o diff sem precisa
 1. Branch base: a principal do projeto (`AGENTS.md` ou `CONTRIBUTING.md`; senão `git symbolic-ref refs/remotes/origin/HEAD`).
 2. `git log --oneline <base>..HEAD` e `git diff --stat <base>...HEAD`; leia o diff inteiro, não só o resumo. Alterações não commitadas: avise que ficam fora do PR.
 3. O arquivo da tarefa (`.dev-ai-first/<branch>.md`), se existir: critérios, decisões, evidências, não verificado.
-4. O modelo de PR do projeto (`.github/pull_request_template.md` ou equivalente). Sem modelo, use as seções abaixo.
+4. O modelo do projeto (`.github/pull_request_template.md`, `.gitlab/merge_request_templates/` ou equivalente). Sem modelo, use as seções abaixo.
 
 ## Escrever
 Preencha o modelo do projeto; sem modelo, use:
@@ -25,4 +25,4 @@ Regras:
 - PR com mais de ~400 linhas alteradas (sem gerados) ou com mais de um assunto: sugira dividir.
 
 ## Entregar
-Mostre a descrição ao dev e grave-a no arquivo da tarefa. Abra o PR (ex.: `gh pr create`) só se o dev pedir; push é ação dele.
+Mostre a descrição ao dev e grave-a no arquivo da tarefa. Abra o PR/MR (`gh pr create`, `glab mr create`) só se o dev pedir; push é ação dele.

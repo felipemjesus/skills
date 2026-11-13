@@ -13,21 +13,23 @@ O dev pede algo ao agente e recebe código fora da arquitetura, sem teste, com r
 1. **Contexto no repositório:** o agente não sabe a stack, os comandos, onde fica cada coisa, qual código imitar, o que precisa perguntar. Então adivinha.
 2. **Um ciclo de entrega:** sem um roteiro, o "pronto" vira "os testes passaram" (quando há testes), e ninguém confere o diff contra o que foi pedido.
 
-Já existe um kit de documentos para isso (`AGENTS.md`, `ARCHITECTURE.md`, `CODEBASE_MAP.md`, ADRs...), mas adotá-lo é manual: copiar arquivos, preencher centenas de marcadores e, depois, lembrar de seguir o kit a cada demanda.
+Já existe um kit de documentos para isso (`AGENTS.md`, `ARCHITECTURE.md`, `CODEBASE_MAP.md`, ADRs...), mas adotá-lo é manual: copiar arquivos, preencher centenas de marcadores e, depois, lembrar de seguir o kit a cada demanda. E, como mostrou a avaliação da seção 5, documento longo gerado por agente não melhora o código que o agente escreve. O que melhora é o agente conseguir **provar** que terminou.
 
 ## O que a skill faz
 
 | Modo | Quando | O que faz |
 |---|---|---|
-| **Preparar** · pasta vazia | projeto novo | entrevista em 2 rodadas (projeto e domínio → stack), com recomendação em cada pergunta; gera os documentos para agentes |
-| **Preparar** · código existente | projeto que já roda | lê o código com subagentes em paralelo (stack, estrutura, domínio, qualidade); preenche o que o código responde, com evidência `arquivo:linha`; pergunta só o que é decisão do dev; descreve o projeto **como ele é**, separando regra cumprida, meta e dívida |
-| **Preparar** · já preparado | qualquer momento | diagnóstico de prontidão IA first: o que falta para o agente provar que terminou, por prioridade |
-| **Entregar** | toda demanda | entender → planejar com checklist de design (fato se busca, decisão se pergunta) → teste primeiro → implementar → verificar → revisão independente por subagente → descrição do PR e documentação atualizada |
+| **Preparar** · código existente | projeto que já roda | **enxuto:** detecta perfil (backend, frontend SPA ou servidor, fullstack), **roda** o que o projeto tem (verificação, testes, lint, build) e gera 4 arquivos curtos: `AGENTS.md` só com o que o código não mostra (comandos, regras inegociáveis com `arquivo:linha`, armadilhas, pronto), `docs/PRINCIPIOS.md` fixo, `docs/VERIFICACAO.md` (como provar cada funcionalidade rodando o sistema) e `docs/IA_FIRST.md` (diagnóstico e plano para o projeto ficar agent-friendly, em demandas priorizadas) |
+| **Preparar** · já governado | o projeto tem instruções próprias para agentes | não toca nelas; acrescenta só o que falta e propõe o resto |
+| **Preparar** · pasta vazia | projeto novo | entrevista em 2 rodadas (projeto e domínio → stack, perfil e estrutura), com recomendação em cada pergunta; o kit completo propõe a estrutura (fatias verticais, ADRs) |
+| **Preparar** · documento longo | sob pedido | `ARCHITECTURE.md`, `CODEBASE_MAP.md`, `CODING_GUIDELINES.md`... copiados só se pedidos, filtrados por estrutura, perfil e módulos |
+| **Entregar** | toda demanda | proporcional ao tamanho: linha de base da verificação → critérios da demanda → exemplo de referência → teste primeiro observado (falha, depois passa) → implementar → verificar rodando → revisão independente por subagente **quando há risco** (demanda média/grande, perguntar antes, segurança, verificação que não rodou) → descrição do PR |
 | `retomar` | sessão nova ou contexto resumido | continua a demanda pelo arquivo de estado, conferindo com `git log`/`git diff` |
 | `revisar` | qualquer diff | revisão por subagente sem o histórico da conversa: "decidido × feito" e achados com `arquivo:linha` |
 | `pr` | antes de abrir o PR | descrição a partir do diff: o quê, por quê, como foi verificado (com o teste falhando antes), o que não foi verificado, autorizações |
 
 Princípios que valem em todos os modos:
+- **Padrão do projeto + princípios.** O código novo imita o vizinho do mesmo tipo, e os princípios de arquitetura e de código valem dentro dele. Onde o padrão contraria um princípio, o agente registra e pergunta; não corrige por conta própria.
 - **O projeto manda.** Depois de preparado, as regras estão no `AGENTS.md` do projeto; a skill conduz o processo e não repete as regras.
 - **Fato se busca, decisão se pergunta.** Nunca inventa regra de negócio, meta, limite ou dono.
 - **Nada irreversível sem pedido:** não commita, não dá push, não sobrescreve arquivo, não instala dependência, não muda CI ou lint sozinha.
@@ -68,21 +70,28 @@ Sem a barra, a skill também é acionada por pedidos como "prepara este reposit�
 
 ```
 skills/dev-ai-first/
-├── SKILL.md                  # detecta a situação e roteia (curto)
+├── SKILL.md                    # regras de todos os modos e roteamento por situação (curto)
 ├── references/
-│   ├── preparar.md           # entrevista, leitura do código, onde buscar cada marcador, diagnóstico
-│   ├── entregar.md           # ciclo de entrega, arquivo da tarefa, retomar
-│   ├── revisar.md            # pedido do revisor independente
-│   └── pr.md                 # descrição do PR
+│   ├── preparar.md             # preparar enxuto (padrão em projeto existente) e projeto governado
+│   ├── preparar-completo.md    # kit completo: pasta vazia ou documento longo sob pedido
+│   ├── entregar.md             # ciclo de entrega proporcional, arquivo da tarefa, retomar
+│   ├── revisar.md              # revisor independente, com fim definido
+│   ├── pr.md                   # descrição do PR ou MR
+│   └── exemplos.md             # exemplos mínimos, só para pasta vazia
 ├── scripts/
-│   ├── detectar-projeto.sh   # vazio / código / preparado; manifestos, subprojetos
-│   ├── copiar-kit.sh         # copia o kit sem sobrescrever; lista conflitos
-│   ├── listar-marcadores.sh  # o que falta preencher, por quem decide
-│   └── verificar-links.sh    # links e âncoras dos documentos existem
-└── assets/kit/               # kit dev-por-agentes agnóstico de stack
+│   ├── detectar-projeto.sh     # situação, perfil, módulos, ambiente, forja, codificação, segredos (sem o valor)
+│   ├── copiar-kit.sh           # --minimo, ou estrutura/perfil/módulos/arquivos; nunca sobrescreve; manifesto
+│   ├── listar-marcadores.sh    # AGENTE / USUARIO / VERIFICAR; só AGENTE reprova
+│   ├── verificar-links.sh      # links e âncoras; --alterados para só o que mudou
+│   └── verificar-citacoes.sh   # arquivo:linha e caminhos citados existem; --mostrar (segredos mascarados)
+└── assets/
+    ├── minimo/                 # os 4 documentos do preparar enxuto
+    ├── kit/                    # kit completo, com blocos condicionais por estrutura, perfil e módulo
+    ├── kit-indice.tsv          # módulo e propósito de cada arquivo do kit
+    └── kit-exemplos.txt        # nomes ilustrativos que não podem sobrar no projeto
 ```
 
-O `SKILL.md` tem ~45 linhas e carrega só a referência do modo em uso. O kit em `assets/` só é lido quando o modo Preparar copia ou consulta um documento.
+O `SKILL.md` carrega só a referência do modo em uso. O kit completo em `assets/kit/` só é lido em pasta vazia ou quando o dev pede um documento longo. O roteiro de avaliação da skill está em [avaliacao.md](avaliacao.md).
 
 ## Como evoluiu
 
@@ -158,8 +167,40 @@ Ao preparar a skill para este repositório público:
 - **Testes:** 20 testes automatizados dos scripts e do validador de skills, cobrindo os casos que deram problema no uso real (arquivo existente não é sobrescrito, `AGENTS.md` de outra origem não conta como kit, âncora com acento). Uma sabotagem confirmou que os testes pegam regressão.
 - **CI:** `make verify` roda em Linux e macOS a cada push e pull request.
 
+### 5. Avaliação com projetos reais (13/11)
+
+Até aqui a skill tinha sido testada num único projeto. Para medir de verdade, rodei-a em **28 repositórios reais** (cópias isoladas, com nomes neutros, sem `.env` e sem nenhuma informação dos projetos nos relatórios), em quatro rodadas. O roteiro está em [avaliacao.md](avaliacao.md).
+
+- **Camada 1, scripts nos 28 repositórios:** o detector só via instruções para agentes na raiz (viu 6 de 119), não dava pista de linguagem quando não havia manifesto e não via subprojetos mais fundos. O verificador de links levava até 139 s e acusava links quebrados antigos do projeto. Os dois foram reescritos: o verificador passou a 0,14 s.
+- **Camada 2, a skill inteira em 3 projetos de perfis diferentes:** um frontend SPA já governado pelo time, um fullstack e um legado sem manifesto, sem testes e fora de UTF-8.
+
+| Rodada | O que mudou | Tokens para preparar | Esforço gasto com o kit |
+|---|---|---|---|
+| 1 (linha de base) | — | 229 mil | ~50% |
+| 2 | kit em módulos, índice e blocos condicionais; AGENTS.md menor; scripts novos | 167 mil | ~55% |
+| 3 | princípios separados da estrutura; perfis backend/frontend/fullstack; mapa de verificação | 187 mil | ~55–60% |
+| **4** | **preparar enxuto + entregar proporcional** | **105 mil** | **~25%** |
+
+O que decidiu a rodada 4 foram dois testes A/B **às cegas**: a mesma demanda implementada com e sem a skill, e um juiz independente lendo só os diffs.
+
+| Teste | Resultado |
+|---|---|
+| Documentos longos gerados pela skill × nenhum documento | **sem documentos: 2 vitórias e 1 empate**, e os documentos custaram 30% a mais. Num caso, uma afirmação do documento desviou o agente do padrão real do código. É o mesmo resultado de um estudo recente com Claude Code, Codex e Qwen: arquivo de contexto gerado por LLM não melhora o sucesso e encarece a execução |
+| Modo entregar × agente puro, **sem conseguir rodar nada** | 1 vitória mínima da skill e 2 empates, com +56% de custo |
+| **Skill da rodada 4 × agente puro, os dois rodando testes de verdade** | **skill: 2 vitórias e 1 empate; 0 bug grave contra 1** |
+
+Lições:
+- **Documento longo gerado não se paga.** O agente imita o código vizinho de qualquer jeito. O que ajuda é pouco texto com o que o código não mostra (comandos, regras inegociáveis, armadilhas) e o projeto ser verificável.
+- **Princípio e estrutura não podem estar no mesmo texto.** Quando o kit misturava os dois, o agente reescrevia os princípios para caberem no projeto. Agora os princípios vão num arquivo fixo e a estrutura é a do projeto.
+- **A diferença está em provar.** No legado sem testes, o agente com a skill montou um teste fora do repositório, viu falhar e depois passar, e com isso tratou um caso de borda que o agente puro deixou aberto, com um bug grave. É a mesma conclusão de quem trabalha com agentes em escala: o que dá confiança é verificação executável, não instrução.
+- **Revisão independente com fim definido** achou riscos reais em todas as rodadas (promessa falsa numa especificação, sobrescrita concorrente, dado que seria inventado). Na v4 ela roda só quando há risco, para não pesar em demanda pequena.
+- **Segurança:** o detector passou a achar credenciais embutidas em URLs, e o `--mostrar` nunca imprime a linha de um possível segredo.
+
+**Limites:** 3 projetos e uma execução por braço, demandas pequenas, juiz e implementador do mesmo fabricante de modelo, e parte dos projetos sem como rodar o backend.
+
 ## Próximos passos
 
 - Kit `aplicacao-de-ia` (prompts versionados, evals, guardrails) como modo opcional, para produtos com LLM.
 - Kits prontos de TypeScript e PHP como referência quando a stack bate.
 - `sincronizar`: apontar a documentação que o diff deixou desatualizada, no CI.
+- Repetir a avaliação A/B com mais projetos e demandas maiores, e com juiz de outro fabricante de modelo.

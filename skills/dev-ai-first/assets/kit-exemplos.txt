@@ -1,0 +1,10 @@
+# Nomes ilustrativos usados no kit. Se aparecerem nos documentos do projeto
+# e não existirem no código, são exemplos do kit que sobraram (verificar-citacoes.sh).
+Pedido
+ItemPedido
+Venda
+Estoque
+Pagamento
+totalIgualSomaItens
+src/modules/vendas
+src/modules/pedidos

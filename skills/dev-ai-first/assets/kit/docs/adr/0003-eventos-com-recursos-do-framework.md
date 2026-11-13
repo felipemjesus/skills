@@ -5,31 +5,20 @@
 
 ## Contexto
 
-Módulos reagem a fatos de outros módulos (ex.: reservar estoque quando um pedido é aprovado). Dentro do módulo, histórico, caixa de entrada e registros dependentes precisam ser consistentes com a operação, e "o que é atômico" e "o que acontece depois" precisam se responder lendo o caso de uso. O risco clássico é a inconsistência entre estado e evento: o estado muda e o evento se perde, ou o evento sai e a transação é desfeita.
-
-{{AGENTE: FRAMEWORK}} oferece eventos, listeners e filas ({{AGENTE: MECANISMO_DE_COMANDOS_E_EVENTOS_DO_FRAMEWORK}}, {{AGENTE: MECANISMO_DE_FILAS_DO_FRAMEWORK}}), incluindo despachar um evento ou job só depois do commit da transação. Com framework first ([ADR-0005](0005-framework-first.md)), uma outbox própria com relay só se justifica se esses recursos não derem a garantia necessária.
+Módulos reagem a fatos de outros módulos, e dentro do módulo histórico e registros dependentes precisam ser consistentes com a operação. "O que é atômico" e "o que acontece depois" devem se responder lendo o caso de uso. O risco é o estado mudar e o evento se perder, ou o evento sair e a transação ser desfeita. O framework oferece eventos, listeners, filas e despacho depois do commit.
 
 ## Opções consideradas
 
-1. **Eventos e filas do framework, despachados depois do commit.** Simples e idiomático. Se o processo cair entre o commit e o despacho, o evento se perde, a menos que a fila seja persistida no mesmo banco e na mesma transação.
-2. **Transactional outbox própria:** gravar o evento numa tabela na mesma transação; um relay publica depois. Nenhum evento se perde, ao custo de uma tabela, um relay e monitoramento próprios.
-3. **Transação distribuída (2PC).** Complexa e mal suportada pela maioria das mensagerias.
+1. **Eventos e filas do framework, despachados depois do commit.** Simples e idiomático; se o processo cair entre o commit e o despacho, o evento se perde, a menos que a fila seja gravada no mesmo banco e na mesma transação.
+2. **Outbox própria** (evento gravado na transação, relay publica depois). Nada se perde, ao custo de tabela, relay e monitoramento próprios.
+3. **Transação distribuída (2PC).** Complexa e mal suportada.
 
 ## Decisão
 
-Opção 1 como padrão.
-
-- **Passo do caso de uso × reação a um fato.** O que faz parte da consistência da operação (gravar o agregado, histórico, caixa de entrada, outro registro do mesmo módulo) é passo explícito do handler, dentro da transação. Evento é só para reação posterior. Listener nunca grava nem muda o agregado que disparou o evento. O mapa evento → reações fica num só lugar; marcar no evento as capacidades que ele aciona é aceito como forma desse registro, só para reações após o commit.
-- **Transação do caso de uso** (decidida aqui porque define o que é "depois do commit"): o limite fica à vista no handler; **uma transação por caso de uso**, que pode incluir os registros do mesmo módulo que o negócio exige consistentes, nunca de outro módulo; o repository nunca abre nem confirma transação; transações não se aninham (um caso de uso que chama outro reaproveita a transação). Detalhes em [ARCHITECTURE.md](../../ARCHITECTURE.md#51-comando-escrita).
-- Eventos de domínio são despachados pelo mecanismo do framework, **depois do commit** da transação ({{AGENTE: RECURSO_DE_DESPACHO_APOS_COMMIT}}). HTTP, e-mail e fila nunca dentro da transação.
-- Reações assíncronas são listeners enfileirados na fila do framework, com retry e *dead letter* conforme a documentação.
-- Entrega *at-least-once* e consumidores idempotentes.
-- Se a fila do framework usa o próprio banco relacional como armazenamento, o job gravado dentro da transação é atômico com a mudança de estado: verifique na documentação do framework como o despacho dentro de transação se comporta.
-- **Exceção:** outbox própria (opção 2) só quando a perda de um evento for inaceitável e a fila adotada não for gravada na mesma transação (ex.: broker externo). A exceção é registrada em ADR própria, com o fluxo que exige.
-- Event sourcing **não** é adotado como padrão.
+Opção 1 como padrão. Passo do caso de uso (consistência da operação) fica explícito no caso de uso, dentro de **uma transação por caso de uso**, aberta e confirmada à vista, nunca pelo repository; reação a um fato é despachada depois do commit e nunca grava o agregado que disparou o evento. Consumidores idempotentes, entrega *at-least-once*. Outbox própria só quando a perda de um evento for inaceitável e a fila não for gravada na mesma transação, registrada em ADR própria. Event sourcing não é o padrão. Detalhes: [ARCHITECTURE.md §5.1](../../ARCHITECTURE.md#51-comando-escrita) e [§5.3](../../ARCHITECTURE.md#53-eventos-passo-do-caso-de-uso--reação-a-um-fato).
 
 ## Consequências
 
-- **Positivas:** nada de infraestrutura de eventos própria; listeners, retries e filas seguem a documentação; testes usam os fakes de eventos e filas do framework.
-- **Negativas:** o handler fica mais longo, porque histórico e caixa de entrada viram passos à vista; com fila fora do banco, existe uma janela pequena de perda entre commit e despacho; consumidores precisam ser idempotentes; consistência eventual entre módulos.
-- **Monitorar:** jobs falhos e tamanho da *dead letter queue*; idade do job mais antigo pendente.
+- **Positivas:** nenhuma infraestrutura de eventos própria; retries e filas seguem a documentação; testes usam os fakes do framework.
+- **Custos aceitos:** o caso de uso fica mais longo, com histórico e registros dependentes à vista; com fila fora do banco, uma janela pequena de perda entre commit e despacho; consistência eventual entre módulos.
+- **Monitorar:** jobs falhos, tamanho da *dead letter queue*, idade do job pendente mais antigo.
