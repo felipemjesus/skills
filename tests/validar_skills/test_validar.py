@@ -27,6 +27,26 @@ class ValidarSkills(unittest.TestCase):
         self.skill("boa-skill", 'name: boa-skill\ndescription: Faz algo. Use quando...\nmetadata:\n  version: "1.0.0"')
         self.assertEqual(self.validar().returncode, 0)
 
+    def test_valor_sem_aspas_com_dois_pontos_quebra_o_yaml(self):
+        self.skill("boa-skill", "name: boa-skill\ndescription: Conduz a demanda: entender, planejar.")
+        resultado = self.validar()
+        self.assertEqual(resultado.returncode, 1)
+        self.assertIn("linha 3, campo 'description'", resultado.stdout)
+
+    def test_valor_entre_aspas_simples_com_dois_pontos_e_valido(self):
+        self.skill("boa-skill", "name: boa-skill\ndescription: 'Conduz a demanda: entender, planejar. It''s ok.'")
+        self.assertEqual(self.validar().returncode, 0, self.validar().stdout)
+
+    def test_skills_do_repositorio_sao_yaml_valido_para_parser_estrito(self):
+        try:
+            import yaml
+        except ImportError:
+            self.skipTest("PyYAML não instalado")
+        for arquivo in (VALIDADOR.parents[1] / "skills").glob("*/SKILL.md"):
+            texto = arquivo.read_text(encoding="utf-8")
+            dados = yaml.safe_load(texto.split("---\n")[1])
+            self.assertIsInstance(dados.get("description"), str, arquivo)
+
     def test_name_diferente_da_pasta(self):
         self.skill("pasta", "name: outro-nome\ndescription: x")
         resultado = self.validar()

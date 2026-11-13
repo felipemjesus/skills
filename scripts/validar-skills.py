@@ -37,8 +37,33 @@ def ler_frontmatter(texto: str):
         chave, _, valor = linha.partition(":")
         atual = chave.strip()
         valor = valor.strip()
-        campos[atual] = {} if atual == "metadata" and not valor else valor.strip('"')
+        campos[atual] = {} if atual == "metadata" and not valor else desaspar(valor)
     return campos, texto[fim + 5 :]
+
+
+def desaspar(valor: str) -> str:
+    """Tira as aspas de um escalar YAML: 'a''b' vira a'b; "a" vira a."""
+    if len(valor) >= 2 and valor[0] == valor[-1] == "'":
+        return valor[1:-1].replace("''", "'")
+    if len(valor) >= 2 and valor[0] == valor[-1] == '"':
+        return valor[1:-1]
+    return valor
+
+
+def problemas_yaml(texto: str) -> list[str]:
+    """Valores de topo sem aspas que um parser YAML estrito recusa ou lê errado (GitHub, CLIs)."""
+    fim = texto.find("\n---\n", 4)
+    problemas = []
+    for numero, linha in enumerate(texto[4:fim].splitlines(), start=2):
+        if not linha or linha.startswith(" "):
+            continue
+        chave, _, valor = linha.partition(":")
+        valor = valor.strip()
+        if not valor or valor[0] in "'\"":
+            continue
+        if ": " in valor or " #" in valor or valor[0] in "[]{}&*!|>%@`,?-":
+            problemas.append(f"linha {numero}, campo '{chave.strip()}'")
+    return problemas
 
 
 def validar(skill: pathlib.Path) -> list[str]:
@@ -49,6 +74,11 @@ def validar(skill: pathlib.Path) -> list[str]:
     if campos is None:
         return [f"{arquivo}: sem frontmatter. Faça isto: comece o arquivo com um bloco --- name/description ---."]
     erros = []
+    for problema in problemas_yaml(arquivo.read_text(encoding="utf-8")):
+        erros.append(
+            f"{arquivo}: {problema}: valor sem aspas com ': ', ' #' ou caractere especial no início quebra o YAML. "
+            "Faça isto: ponha o valor entre aspas simples (aspa simples interna vira '')."
+        )
     nome = campos.get("name", "")
     if not (1 <= len(nome) <= 64 and NOME.match(nome)):
         erros.append(f"{arquivo}: name '{nome}' inválido. Faça isto: use 1 a 64 caracteres a-z, 0-9 e hífen simples.")
