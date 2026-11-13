@@ -50,8 +50,9 @@ Skills são instruções estruturadas que dão ao agente experiência num domín
 
 Torna o repositório **IA first** e conduz as entregas do dev com agentes de código, **com qualidade**.
 
-- **Preparar:** numa pasta vazia, entrevista o dev sobre projeto, domínio e stack. Num projeto existente, lê o código com subagentes e gera `AGENTS.md`, `ARCHITECTURE.md`, `CODEBASE_MAP.md`, `CODING_GUIDELINES.md`, `TESTING.md` e ADRs descrevendo o projeto como ele é, com evidência, perguntando só o que é decisão do dev. Termina com um diagnóstico do que falta para o agente provar que terminou.
-- **Entregar:** conduz cada demanda com checklist de design (fato se busca, decisão se pergunta), teste primeiro, verificação completa, revisão por um subagente independente, descrição do PR e documentação atualizada.
+- **Preparar:** num projeto existente, roda o que o projeto tem e gera um `AGENTS.md` enxuto (comandos, regras inegociáveis, armadilhas, pronto), os princípios de arquitetura e de código como texto fixo, um mapa de verificação e um plano para o projeto ficar agent-friendly. Numa pasta vazia, entrevista o dev e o kit completo propõe a estrutura. Detecta o perfil (backend, frontend, fullstack) e respeita instruções que o projeto já tenha.
+- **Entregar:** conduz cada demanda na medida do tamanho: critérios, exemplo de referência, teste primeiro observado, verificação rodando o sistema, revisão por subagente independente quando há risco, descrição do PR.
+- **Avaliada às cegas** contra o agente puro em projetos reais: veja a seção 5 de [docs/dev-ai-first.md](docs/dev-ai-first.md).
 - **Atalhos:** `retomar`, `revisar` e `pr`.
 
 ```text

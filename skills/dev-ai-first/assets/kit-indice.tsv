@@ -1,0 +1,30 @@
+modulo	arquivo	para que serve
+nucleo	AGENTS.md	contexto de toda sessão: comandos, limites, definição de pronto
+nucleo	ARCHITECTURE.md	estilo, responsabilidades, fluxos de escrita e leitura, riscos
+nucleo	CODEBASE_MAP.md	onde fica cada coisa, nomes, exemplos de referência, receitas
+nucleo	CODING_GUIDELINES.md	regras de código e de perguntas do agente
+nucleo	TESTING.md	estratégia de testes, comandos, correção de bugs
+nucleo	SECURITY.md	contato, segredos, dados sensíveis, checklist de revisão
+nucleo	CONTRIBUTING.md	branches, commits, PR, revisão humana
+nucleo	docs/DOMAIN.md	glossário, agregados, invariantes
+nucleo	docs/CHECKLIST_DESIGN.md	perguntas de design respondidas no plano de cada demanda
+nucleo	docs/VERIFICACAO.md	mapa de verificação: como provar cada funcionalidade rodando o sistema
+nucleo	docs/adr/README.md	índice das ADRs e quando escrever uma
+nucleo	docs/adr/0000-template.md	modelo de ADR
+estrutura-kit	docs/adr/0002-monolito-modular-com-fatias-verticais.md	ADR do estilo do kit: monolito modular com fatias
+estrutura-kit	docs/adr/0003-eventos-com-recursos-do-framework.md	ADR do estilo do kit: eventos do framework
+estrutura-kit	docs/adr/0004-interfaces-so-em-fronteiras.md	ADR do estilo do kit: interfaces só em fronteiras
+estrutura-kit	docs/adr/0005-framework-first.md	ADR do estilo do kit: framework first
+frontend	docs/FRONTEND.md	regras do frontend (perfil frontend ou fullstack; variante spa ou servidor)
+api	docs/API_GUIDELINES.md	convenções da API HTTP
+eventos	docs/EVENTS.md	eventos, reações, garantias, catálogo
+observabilidade	docs/OBSERVABILITY.md	logs, métricas, SLOs
+observabilidade	docs/runbooks/0000-template.md	modelo de runbook
+claude	CLAUDE.md	ponte do Claude Code para o AGENTS.md (copiar por último)
+github	.github/pull_request_template.md	modelo de PR
+gitlab	.gitlab/merge_request_templates/Default.md	modelo de MR
+nucleo	docs/design-docs/0000-template.md	modelo de design doc (demanda grande)
+minimo	AGENTS.md	preparar enxuto: comandos, ordem de verdade, regras inegociáveis, armadilhas, pronto
+minimo	docs/PRINCIPIOS.md	preparar enxuto: princípios fixos de arquitetura e código (não editar)
+minimo	docs/VERIFICACAO.md	preparar enxuto: mapa de verificação
+minimo	docs/IA_FIRST.md	preparar enxuto: plano para o projeto ficar agent-friendly

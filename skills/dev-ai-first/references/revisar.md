@@ -7,7 +7,7 @@ Quem revisa não é quem escreveu. A revisão roda num subagente (no Claude Code
 O pedido é autossuficiente e leva **só**:
 1. A demanda literal e a tabela de critérios e decisões (do arquivo da tarefa ou do design doc). Sem arquivo da tarefa (`/dev-ai-first revisar` avulso): pergunte ao dev o que a mudança devia fazer, ou use a descrição do PR.
 2. O intervalo do diff: `git diff <branch principal>...HEAD`, mais as alterações não commitadas, se houver.
-3. Onde estão as regras: `AGENTS.md`, `CONTRIBUTING.md` (seção "Revisão de código"), `ARCHITECTURE.md` §4.1 do projeto.
+3. Onde estão as regras: `AGENTS.md`, `docs/CHECKLIST_DESIGN.md`, `CONTRIBUTING.md` (seção "Revisão de código"), `ARCHITECTURE.md` §4.1 do projeto, e a seção [Critérios gerais](#critérios-gerais) abaixo para o que o projeto não define.
 
 **Não** leve as justificativas do autor, o que já foi discutido nem o que aceitar.
 
@@ -26,6 +26,15 @@ Copie para o pedido:
 ## Depois da revisão
 1. Confira cada achado no código antes de agir: o revisor também erra. Descartou um? Diga por quê no arquivo da tarefa.
 2. Corrija os `bloqueante:` numa rodada só e rode a verificação de novo.
-3. Re-revisão (se houve correção) reabre só o que divergiu. O que continuar falhando vai ao dev como "precisa de decisão".
+3. No máximo uma re-revisão, e só se houve correção: ela reabre só o que divergiu. O que continuar falhando vai ao dev como "precisa de decisão"; não abra uma terceira rodada.
 4. Registre o veredito e os achados tratados no arquivo da tarefa; eles entram na descrição do PR.
 5. Achado que se repete em demandas diferentes: proponha ao dev uma regra automática (lint ou arquitetura) em vez de confiar na próxima revisão.
+
+## Critérios gerais
+
+Ensino genérico, para quando o projeto não tiver regra própria; a regra do projeto vence.
+- **SOLID:** S, um motivo para mudar por classe; O, variação de comportamento por estratégia injetada, não `if/switch` crescente; L, toda implementação de uma interface (inclusive o fake) passa na mesma suíte de contrato; I, interfaces pequenas com nome de negócio; D, inversão só nas fronteiras externas.
+- **Demeter:** fale com vizinhos imediatos (`pedido.total()`, não `pedido.itens.map(...).reduce(...)` fora do agregado). **Tell, don't ask:** peça ao objeto para fazer, não decida por ele lendo o estado. **CQS:** um método altera estado ou devolve dado, não os dois. Composição antes de herança.
+- **Code smells → refatoração:** função longa → extrair; muitos parâmetros → objeto de parâmetros ou VO; obsessão por primitivos → VO; `switch` sobre tipo repetido → polimorfismo; inveja de recursos → mover método; campos sempre juntos → extrair VO; mudança divergente → dividir classe; cirurgia espalhada → reunir responsabilidade; número mágico → constante com nome; mesmo conceito com duas definições → consolidar; nome que mente (`existe(): void`, `listarTodos` que filtra) → renomear.
+- **Testes:** um comportamento por teste; nome que diz o cenário e o resultado; teste que falharia se a regra fosse falsa (não tautológico); sem `sleep` nem dependência de ordem; dublê só na fronteira.
+- **Comentários:** explicam o porquê; comentário que repete o código, falso ou código comentado é achado.

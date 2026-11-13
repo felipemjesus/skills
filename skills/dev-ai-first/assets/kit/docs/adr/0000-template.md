@@ -1,27 +1,24 @@
-# NNNN. {{Título curto no imperativo ou como decisão}}
+# NNNN. {{Decisão, não pergunta}}
 
 - **Status:** Proposta
 - **Data:** {{AAAA-MM-DD}}
-- **Decisores:** {{nomes}}
 - **Relacionadas:** {{ADRs, issues, design docs}}
 
 ## Contexto
 
-{{Qual é o problema? Quais forças estão em jogo: requisitos, restrições, atributos de qualidade, prazos, equipe? Escreva de forma que alguém sem contexto entenda por que uma decisão é necessária.}}
+{{O problema e as forças em jogo (requisitos, restrições, prazos), para quem não tem contexto.}}
 
 ## Opções consideradas
 
-1. **{{Opção A}}**: {{descrição}}. Prós: … Contras: … Por que não: …
-2. **{{Opção B}}**: {{descrição}}. Prós: … Contras: … Por que não: …
-3. **Não fazer nada**: {{o que acontece}}.
+1. **{{Opção A}}**: {{prós, contras, por que não}}
+2. **{{Opção B}}**: {{prós, contras, por que não}}
 
 ## Decisão
 
-{{Escolhemos X porque... Seja direto.}}
+{{Escolhemos X porque... Poucas linhas; a regra detalhada fica no documento dono, com link.}}
 
 ## Consequências
 
 - **Positivas:** {{…}}
-- **Negativas / custos aceitos:** {{… (toda decisão tem trade-off; se não houver negativa, a decisão provavelmente não precisa de ADR)}}
-- **Riscos e como vamos monitorar:** {{…}}
-- **Quando revisitar:** {{gatilho concreto, ex.: "se o módulo X precisar escalar independentemente"}}
+- **Custos aceitos:** {{sem custo, provavelmente não precisa de ADR}}
+- **Quando revisitar:** {{gatilho concreto}}
