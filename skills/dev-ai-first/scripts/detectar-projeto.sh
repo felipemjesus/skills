@@ -6,8 +6,11 @@
 # Uso: detectar-projeto.sh [pasta]   (padrão: pasta atual)
 # Saída: linhas "chave: valor", fáceis de ler por pessoa e por agente.
 # Situações: vazio | codigo | governado (já tem instruções para agentes, sem o kit) | preparado (kit presente)
+# Listas longas saem resumidas ("(+N)"), para a saída caber no contexto do agente.
+# Códigos de saída: 0 ok; 2 uso errado (pasta inexistente).
 
 set -euo pipefail
+for _a in "$@"; do case "$_a" in -h|--help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac; done
 
 raiz="${1:-.}"
 if [ ! -d "$raiz" ]; then
@@ -154,10 +157,10 @@ if [ "$kit" = sim ]; then
 fi
 
 case "$situacao" in
-  vazio)     echo "proximo_passo: preparar (entrevista) — ver references/preparar.md §Pasta vazia" ;;
-  codigo)    echo "proximo_passo: preparar (leitura do código) — ver references/preparar.md §Código existente" ;;
+  vazio)     echo "proximo_passo: preparar (entrevista) — ver references/preparar-completo.md §Pasta vazia" ;;
+  codigo)    echo "proximo_passo: preparar (leitura do código) — ver references/preparar.md §Passo a passo" ;;
   governado) echo "proximo_passo: preparar complementando as instruções existentes — ver references/preparar.md §Projeto já governado" ;;
-  preparado) echo "proximo_passo: entregar, ou diagnóstico se o dev pediu preparar — ver SKILL.md" ;;
+  preparado) echo "proximo_passo: entregar, ou diagnóstico se o dev pediu preparar — ver references/preparar.md §Diagnóstico de prontidão" ;;
 esac
 
 [ -z "$linguagens" ] && [ "$situacao" != vazio ] && echo "aviso: nenhuma linguagem reconhecida pelas extensões; leia a árvore antes de supor a stack."

@@ -26,7 +26,6 @@ As regras do projeto estão no `AGENTS.md` dele e nos documentos que ele aponta.
 ## 1. Entender
 - Releia o pedido frase a frase: cada frase vira um **critério de aceitação** no arquivo da tarefa. A frase que não cai em lugar nenhum é requisito que some.
 - Leia o código do módulo afetado e os testes existentes (e o `CODEBASE_MAP.md`, se o projeto tiver).
-- **Procure antes de presumir:** busque por nome e por conceito ("disponível", "bloqueado") antes de concluir que algo não existe ou de criar uma regra nova.
 - Ache o **exemplo de referência** do tipo de operação (no `CODEBASE_MAP.md`, se houver; senão, o vizinho mais parecido no código) e um segundo vizinho do mesmo tipo. O código novo segue esse padrão, e os princípios do projeto valem dentro dele. Se o padrão contraria um princípio no trecho que você vai mexer, não corrija por conta própria: siga o padrão e registre a divergência como pergunta no plano.
 
 ## 2. Planejar
@@ -79,7 +78,7 @@ Fora disso (pequena, sem risco e verificada), faça a **autorrevisão:** releia 
 
 Guarda o estado da demanda para que outra sessão continue lendo só arquivos.
 
-- **Onde:** `.dev-ai-first/<branch>.md` na raiz do projeto, com `/` da branch trocada por `-` (sem git: o nome da demanda). Não grave dentro de `.git/`: os agentes costumam bloquear escrita ali. A pasta não é versionada: se `.dev-ai-first/` não está no `.gitignore`, nunca use `git add -A` ou `git add .` (adicione arquivo por arquivo) e proponha ao dev incluir a linha no `.gitignore`. Demanda grande usa o design doc versionado em `docs/design-docs/`, e o arquivo da tarefa só aponta para ele.
+- **Onde:** `.dev-ai-first/<branch>.md` na raiz do projeto, com `/` da branch trocada por `-` (sem git: o nome da demanda). Não grave dentro de `.git/`: os agentes costumam bloquear escrita ali. A pasta não é versionada: se `.dev-ai-first/` não está no `.gitignore`, proponha ao dev incluir a linha. Demanda grande usa o design doc versionado em `docs/design-docs/`, e o arquivo da tarefa só aponta para ele.
 - **Formato:**
 
 ```markdown
@@ -100,7 +99,7 @@ Branch: <branch> · Tamanho: pequena | média | grande · Status: planejando | a
 ## Retomar
 `/dev-ai-first retomar` (ou sessão nova, ou contexto resumido):
 1. Ache o arquivo da tarefa da branch atual (`git branch --show-current`); se houver mais de um candidato, pergunte.
-2. Releia do disco o arquivo da tarefa, o design doc se houver, e os arquivos que vai editar. Nunca edite a partir de trecho lembrado.
+2. Releia do disco o arquivo da tarefa, o design doc se houver, e os arquivos que vai editar.
 3. Confira o estado real com `git log` e `git diff` contra a branch principal: commit é fato; o arquivo da tarefa é intenção. Divergiu? Vale o código; atualize o arquivo e diga o que divergiu.
 4. Rode o teste do último passo marcado para confirmar que ele ainda passa.
 5. Diga ao dev em duas linhas onde a demanda está e qual o próximo passo; siga.

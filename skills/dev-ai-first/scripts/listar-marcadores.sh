@@ -6,23 +6,30 @@
 # Os modelos (0000-template.md, modelos de PR/MR) usam {{...}} sem prefixo
 # e são preenchidos a cada documento novo, por isso ficam de fora.
 #
-# Uso: listar-marcadores.sh [pasta] [--resumo] [--tudo]   (argumentos em qualquer ordem)
+# Uso: listar-marcadores.sh [pasta] [--resumo] [--tudo] [--limite N]   (argumentos em qualquer ordem)
 #   Com .dev-ai-first/kit.lst (gravado pelo copiar-kit.sh), olha só os arquivos que a skill copiou;
 #   --tudo olha todos os .md do projeto.
+#   --limite N: imprime no máximo N linhas de detalhe (padrão 50; 0 = todas); o resumo sai sempre
 # Sai com código 1 se ainda houver marcador AGENTE (trabalho do agente por fazer); USUARIO e VERIFICAR
 # são decisões do dev e não reprovam.
+# Códigos de saída: 0 ok; 1 há marcador AGENTE; 2 uso errado (opção, pasta).
 
 set -euo pipefail
+for _a in "$@"; do case "$_a" in -h|--help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac; done
 
-raiz='' modo='' tudo=''
+raiz='' modo='' tudo='' limite=50 espera_limite=''
 for arg in "$@"; do
+  if [ -n "$espera_limite" ]; then limite="$arg"; espera_limite=''; continue; fi
   case "$arg" in
+    --limite) espera_limite=1 ;;
     --resumo) modo=--resumo ;;
     --tudo) tudo=1 ;;
     -*) echo "erro: opção desconhecida: $arg" >&2; exit 2 ;;
     *) [ -z "$raiz" ] || { echo "erro: mais de uma pasta informada" >&2; exit 2; }; raiz="$arg" ;;
   esac
 done
+[ -z "$espera_limite" ] || { echo "erro: --limite exige um número" >&2; exit 2; }
+case "$limite" in ''|*[!0-9]*) echo "erro: --limite exige um número" >&2; exit 2 ;; esac
 raiz="${raiz:-.}"
 [ -d "$raiz" ] || { echo "erro: '$raiz' não é uma pasta" >&2; exit 2; }
 cd "$raiz"
@@ -58,7 +65,7 @@ echo "AGENTE (o agente preenche a partir do projeto): $n_agente"
 echo "USUARIO (decisão do dev): $n_usuario"
 echo "VERIFICAR (fato que o dev confirma): $n_verificar"
 
-if [ "$modo" != "--resumo" ]; then
+if [ "$modo" != "--resumo" ]; then {
   if [ "$n_agente" -gt 0 ]; then
     echo
     echo "## AGENTE, por arquivo"
@@ -77,6 +84,7 @@ if [ "$modo" != "--resumo" ]; then
       printf '%s\n' "$lista" | sed -E 's/^[^:]+:[0-9]+://' | sort | uniq -c | sort -rn
     fi
   done
+} | awk -v n="$limite" 'n == 0 || NR <= n { print; next } { o++ } END { if (o) printf "... (+%d linhas; --limite 0 para todas)\n", o }'
 fi
 
 [ "$n_agente" -eq 0 ]

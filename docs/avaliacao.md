@@ -13,10 +13,11 @@ Uma mudança na skill só entra se uma avaliação mostrar **custo menor ou igua
    - projeto já governado por instruções para agentes;
    - legado fora de UTF-8.
 
-## Duas camadas
+## Três camadas
 
 | Camada | O que roda | Custo |
 |---|---|---|
+| 0. Evals sintéticos | [evals/dev-ai-first](../evals/dev-ai-first/README.md): 3 casos com e sem a skill, asserções por script e `benchmark.json` (acerto, tokens, tempo); e o teste de ativação da descrição. Rodam fora dos projetos reais, a cada versão | médio |
 | 1. Scripts | `detectar-projeto.sh`, `verificar-links.sh`, `verificar-citacoes.sh` e `listar-marcadores.sh` em todos os projetos, comparados com uma contagem independente (ex.: manifestos e instruções para agentes encontrados por `find`) | baixo |
 | 2. Agente | o modo inteiro, num **subagente novo** por projeto, que lê a skill pelo caminho do repositório, com o dev indisponível (segue as recomendações e registra cada pergunta) e sem acesso externo | alto |
 
@@ -32,7 +33,7 @@ Uma mudança na skill só entra se uma avaliação mostrar **custo menor ou igua
 
 ## Rodada
 
-1. **Linha de base:** a versão atual da skill em todos os projetos da amostra. Guarde o resultado numa branch da cópia (`baseline-vN`).
+1. **Linha de base:** os evals sintéticos (camada 0) e a versão atual da skill em todos os projetos da amostra. Guarde o resultado numa branch da cópia (`baseline-vN`).
 2. **Achados:** junte os atritos que os agentes relatam com as métricas. Uma falha que se repete vira uma mudança proposta. Cada proposta diz o ganho esperado.
 3. **Aprovação** do dono da skill.
 4. **Aplicar** e rodar `make verify`. Cada script novo ou alterado ganha teste, inclusive o teste que copia o kit em todas as combinações de estrutura, perfil e módulo.

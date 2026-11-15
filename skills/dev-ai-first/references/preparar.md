@@ -17,10 +17,9 @@ Documentos longos (ARCHITECTURE, CODEBASE_MAP, CODING_GUIDELINES, TESTING...) s�
 
 1. **Só o que o código não mostra.** Não descreva árvore de pastas, camadas nem fluxo que o agente lê sozinho.
 2. **Sem evidência, não escreva.** Cada regra e cada comando tem `arquivo:linha` ou saída de comando. Fato que você não alcança vira VERIFICAR (`{{VERIFICAR: o que falta confirmar}}`); decisão do dev vira USUARIO.
-3. **`PRINCIPIOS.md` não se edita.** Onde o projeto diverge de um princípio, registre em `IA_FIRST.md`, nunca no princípio.
-4. **Nunca sobrescreva arquivo do projeto.** Já existe `AGENTS.md` ou `CLAUDE.md`? Proponha só o trecho que falta; o limite do projeto vale.
-5. **Gerado é rascunho.** Diga ao dev que os documentos são para ele revisar e podar.
-6. **Codificação:** se o detector avisar arquivos fora de UTF-8, use `grep -a` e preserve a codificação ao editar código.
+3. **Nunca sobrescreva arquivo do projeto.** Já existe `AGENTS.md` ou `CLAUDE.md`? Proponha só o trecho que falta; o limite do projeto vale.
+4. **Gerado é rascunho.** Diga ao dev que os documentos são para ele revisar e podar.
+5. **Codificação:** se o detector avisar arquivos fora de UTF-8, use `grep -a` e preserve a codificação ao editar código.
 
 ## Passo a passo
 
@@ -34,7 +33,6 @@ Documentos longos (ARCHITECTURE, CODEBASE_MAP, CODING_GUIDELINES, TESTING...) s�
 3. **Copie:** `bash <pasta da skill>/scripts/copiar-kit.sh <projeto> --minimo --perfil <perfil> [--frontend spa|servidor] [--modulos claude]`. No modo mínimo, não passe `github` nem `gitlab`: os modelos de PR/MR fazem parte do kit completo. Projeto governado: veja [abaixo](#projeto-já-governado).
 4. **Rode o que existir,** se o dev permitir. O que rodou é o melhor fato que você tem; o que falhou ou não existe vai para o diagnóstico.
    - **Prefira o comando único de verificação** (ou typecheck, lint e um teste de um arquivo) à suíte inteira. Teto de ~10 minutos por comando: passou disso, interrompa e registre o tempo como achado.
-   - **Rode sem modo de correção** (`--fix`, `--write`): o preparar não altera código.
    - **Não dá para instalar** (runtime ausente, dependência privada, credencial que você não deve usar): rode o que der sem instalar (checagem de sintaxe, inclusive em contêiner se houver Docker; build do que estiver instalado) e registre o que ficou de fora.
 5. **Preencha o `AGENTS.md`:**
    - comandos que rodaram ou que existem no manifesto e no CI;

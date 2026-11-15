@@ -7,7 +7,7 @@ metadata:
   author: Felipe Martins
   github: https://github.com/felipemjesus
   repository: https://github.com/felipemjesus/skills
-  version: "3.0.0"
+  version: "3.1.0"
 ---
 
 # dev-ai-first
@@ -23,7 +23,22 @@ Duas funções: **preparar** o repositório para ser desenvolvido com agentes, e
 - **Pronto é evidência:** o comando rodado e o que ele mostrou, e o que não pôde ser verificado.
 - **Estado em arquivo, não na conversa:** decisões e progresso vão para o arquivo da tarefa no turno em que acontecem, para outra sessão continuar.
 
-Caminhos como `scripts/...`, `references/...` e `assets/...` são relativos à pasta deste `SKILL.md`. Rode os scripts pelo caminho absoluto, um comando por chamada e sem `cd` antes (`bash /caminho/da/skill/scripts/x.sh <projeto>`): comando composto costuma cair fora das permissões liberadas pelo dev.
+## Armadilhas
+
+Erros que agentes cometeram usando esta skill. Cada correção que o dev precisar fazer vira uma linha aqui.
+
+- **Documento longo "para ajudar".** Em projeto existente, só o mínimo do [preparar](references/preparar.md); documento longo só se o dev pedir.
+- **Editar `docs/PRINCIPIOS.md` para caber no projeto.** É texto fixo; a divergência vai para o `docs/IA_FIRST.md`.
+- **Rodar lint ou formatador com `--fix`/`--write` no preparar.** O preparar não altera código: rode sem modo de correção.
+- **Esperar a suíte inteira.** Prefira o comando único de verificação ou um arquivo de teste; passou de ~10 minutos, interrompa e registre o tempo.
+- **Instalar com credencial versionada.** Não use: rode o que der sem instalar e registre o que ficou de fora.
+- **Consertar o que está quebrado fora do pedido** (configuração de teste, lint, CI). Registre como pergunta e não mexa.
+- **Concluir que algo não existe sem buscar.** Busque por nome e por conceito antes de criar regra ou função nova.
+- **Editar a partir de trecho lembrado** depois de resumo de contexto ou em sessão nova. Releia o arquivo do disco.
+- **`git add -A` ou `git add .`** com `.dev-ai-first/` fora do `.gitignore`: adicione arquivo por arquivo.
+- **Comando composto** (`cd x && ...`): costuma cair fora das permissões liberadas pelo dev. Rode os scripts pelo caminho absoluto, um comando por chamada: `bash /caminho/da/skill/scripts/x.sh <projeto>`.
+
+Caminhos como `scripts/...`, `references/...` e `assets/...` são relativos à pasta deste `SKILL.md`. Os scripts aceitam `--help`.
 
 ## 1. Descubra a situação
 

@@ -368,3 +368,70 @@ class VerificarCitacoes(PastaTemporaria):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class InterfaceDosScripts(PastaTemporaria):
+    """Cuidados do agentskills.io para scripts usados por agentes: ajuda, saída limitada, códigos de saída."""
+
+    TODOS = ["copiar-kit.sh", "detectar-projeto.sh", "listar-marcadores.sh", "verificar-citacoes.sh", "verificar-links.sh"]
+
+    def test_help_em_todos_sai_zero_com_uso_e_codigos(self):
+        for script in self.TODOS:
+            with self.subTest(script=script):
+                r = rodar(script, "--help")
+                self.assertEqual(r.returncode, 0, r.stderr)
+                self.assertIn("Uso:", r.stdout)
+                self.assertIn("Códigos de saída", r.stdout)
+                self.assertLess(len(r.stdout), 4000)
+
+    def test_opcao_desconhecida_sai_dois(self):
+        for script in ["copiar-kit.sh", "listar-marcadores.sh", "verificar-citacoes.sh", "verificar-links.sh"]:
+            with self.subTest(script=script):
+                self.assertEqual(rodar(script, str(self.pasta), "--nao-existe").returncode, 2)
+
+    def test_limite_invalido_sai_dois(self):
+        for script in ["listar-marcadores.sh", "verificar-citacoes.sh", "verificar-links.sh"]:
+            with self.subTest(script=script):
+                self.assertEqual(rodar(script, str(self.pasta), "--limite", "x").returncode, 2)
+
+    def test_uso_do_copiar_kit_mostra_minimo(self):
+        self.assertIn("--minimo", rodar("copiar-kit.sh").stderr)
+
+    def test_listar_marcadores_limita_detalhe(self):
+        self.escrever("doc.md", "".join(f"{{{{AGENTE: item {i}}}}}\n" for i in range(200)))
+        r = rodar("listar-marcadores.sh", str(self.pasta), "--tudo")
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("AGENTE (o agente preenche a partir do projeto): 200", r.stdout)
+        self.assertIn("--limite 0 para todas", r.stdout)
+        self.assertLess(len(r.stdout.splitlines()), 60)
+        completo = rodar("listar-marcadores.sh", str(self.pasta), "--tudo", "--limite", "0")
+        self.assertGreater(len(completo.stdout.splitlines()), 200)
+
+    def test_verificar_links_limita_e_mantem_resumo(self):
+        self.escrever("doc.md", "".join(f"[x](nao-existe-{i}.md)\n" for i in range(200)))
+        r = rodar("verificar-links.sh", str(self.pasta), "--limite", "10")
+        self.assertEqual(r.returncode, 1)
+        self.assertEqual(len([l for l in r.stdout.splitlines() if "não existe" in l]), 10)
+        self.assertIn("quebrados: 200", r.stdout)
+
+    def test_verificar_citacoes_aviso_nao_esconde_erro(self):
+        avisos = "".join(f"`pasta/nao-existe-{i}`\n" for i in range(100))
+        self.escrever("doc.md", avisos + "`src/falta.ts:3`\n")
+        r = rodar("verificar-citacoes.sh", str(self.pasta), "--limite", "5")
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("erro: arquivo citado não existe: src/falta.ts:3", r.stdout)
+        self.assertEqual(len([l for l in r.stdout.splitlines() if ": aviso:" in l]), 5)
+        self.assertIn("erros: 1", r.stdout)
+
+    def test_proximo_passo_aponta_para_secao_que_existe(self):
+        import re
+        for caso, preparar in [("vazio", lambda: self.escrever("README.md", "# novo")),
+                               ("codigo", lambda: (self.escrever("package.json", "{}"), self.escrever("src/a.ts", "x")))]:
+            with self.subTest(caso=caso):
+                for f in self.pasta.iterdir():
+                    shutil.rmtree(f) if f.is_dir() else f.unlink()
+                preparar()
+                passo = campos(rodar("detectar-projeto.sh", str(self.pasta)).stdout)["proximo_passo"]
+                ref, secao = re.search(r"ver (references/\S+\.md) §(.+)$", passo).groups()
+                texto = (SKILL / ref).read_text(encoding="utf-8")
+                self.assertIn(f"## {secao}\n", texto)

@@ -13,8 +13,10 @@
 #   --estrutura kit:     projeto novo; o kit propõe a estrutura (ADRs 0002 a 0005)
 #   --arquivos:          copia só estes arquivos (caminhos do índice), ex.: projeto já governado
 # Grava em <projeto>/.dev-ai-first/kit.lst o que a skill copiou; rodar de novo só acrescenta.
+# Códigos de saída: 0 ok; 2 uso errado (opção, pasta, perfil ou módulo inválido).
 
 set -euo pipefail
+for _a in "$@"; do case "$_a" in -h|--help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac; done
 
 skill="$(cd "$(dirname "$0")/.." && pwd)"
 kit="$skill/assets/kit"
@@ -22,7 +24,9 @@ indice="$skill/assets/kit-indice.tsv"
 so_trechos='estados cli bdd verificacao-arquitetura'
 
 uso() {
-  echo "uso: copiar-kit.sh <projeto> --estrutura projeto|kit --perfil backend|frontend|fullstack [--frontend spa|servidor] [--modulos a,b] [--arquivos x,y] | --listar" >&2
+  echo "uso: copiar-kit.sh <projeto> --minimo --perfil backend|frontend|fullstack [--frontend spa|servidor] [--modulos claude]" >&2
+  echo "     copiar-kit.sh <projeto> --estrutura projeto|kit --perfil backend|frontend|fullstack [--frontend spa|servidor] [--modulos a,b] [--arquivos x,y]" >&2
+  echo "     copiar-kit.sh --listar   (--help para a ajuda completa)" >&2
   exit 2
 }
 

@@ -70,7 +70,9 @@ Demo (4min51, narrada): [youtu.be/E3Ixk_QQfMU](https://youtu.be/E3Ixk_QQfMU) · 
 │   └── dev-ai-first/          # uma pasta por skill
 ├── scripts/
 │   └── validar-skills.py      # confere o frontmatter de toda skill contra a especificação
-├── tests/                     # testes dos scripts das skills e do validador
+├── tests/                     # testes dos scripts das skills, do validador e das asserções dos evals
+├── evals/
+│   └── dev-ai-first/          # avaliação com projetos sintéticos (com × sem a skill) e teste de ativação
 ├── docs/                      # documentação longa de cada skill
 ├── .github/workflows/         # CI: make verify em Linux e macOS
 └── Makefile
