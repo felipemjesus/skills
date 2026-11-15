@@ -7,7 +7,7 @@ metadata:
   author: Felipe Martins
   github: https://github.com/felipemjesus
   repository: https://github.com/felipemjesus/skills
-  version: "3.2.0"
+  version: "3.3.0"
 ---
 
 # dev-ai-first
@@ -25,18 +25,18 @@ Duas funções: **preparar** o repositório para ser desenvolvido com agentes, e
 
 ## Armadilhas
 
-Erros que agentes cometeram usando esta skill. Cada correção que o dev precisar fazer vira uma linha aqui.
+O caminho certo nos pontos em que agentes erraram usando esta skill. Cada correção que o dev precisar fazer vira uma linha aqui (o modo `retro` propõe).
 
-- **Documento longo "para ajudar".** Em projeto existente, só o mínimo do [preparar](references/preparar.md); documento longo só se o dev pedir.
-- **Editar `docs/PRINCIPIOS.md` para caber no projeto.** É texto fixo; a divergência vai para o `docs/IA_FIRST.md`.
-- **Rodar lint ou formatador com `--fix`/`--write` no preparar.** O preparar não altera código: rode sem modo de correção.
-- **Esperar a suíte inteira.** Prefira o comando único de verificação ou um arquivo de teste; passou de ~10 minutos, interrompa e registre o tempo.
-- **Instalar com credencial versionada.** Não use: rode o que der sem instalar e registre o que ficou de fora.
-- **Consertar o que está quebrado fora do pedido** (configuração de teste, lint, CI). Registre como pergunta e não mexa.
-- **Concluir que algo não existe sem buscar.** Busque por nome e por conceito antes de criar regra ou função nova.
-- **Editar a partir de trecho lembrado** depois de resumo de contexto ou em sessão nova. Releia o arquivo do disco.
-- **`git add -A` ou `git add .`** com `.dev-ai-first/` fora do `.gitignore`: adicione arquivo por arquivo.
-- **Comando composto** (`cd x && ...`): costuma cair fora das permissões liberadas pelo dev. Rode os scripts pelo caminho absoluto, um comando por chamada: `bash /caminho/da/skill/scripts/x.sh <projeto>`.
+- **Em projeto existente, gere só o mínimo do [preparar](references/preparar.md).** Documento longo, só se o dev pedir: o agente imita o código de qualquer jeito.
+- **Copie `docs/PRINCIPIOS.md` como está.** Onde o projeto diverge, registre no `docs/IA_FIRST.md`.
+- **No preparar, rode lint e formatador sem modo de correção** (sem `--fix`/`--write`): o preparar não altera código.
+- **Prefira o comando único de verificação ou um arquivo de teste** à suíte inteira; passou de ~10 minutos, interrompa e registre o tempo.
+- **Rode só o que dá sem instalar** quando a instalação pede credencial versionada, e registre o que ficou de fora.
+- **Registre como pergunta o que está quebrado fora do pedido** (configuração de teste, lint, CI) e siga com o pedido.
+- **Busque por nome e por conceito** antes de concluir que algo não existe ou de criar regra ou função nova.
+- **Releia do disco o arquivo que vai editar** depois de resumo de contexto ou em sessão nova.
+- **Adicione arquivo por arquivo** (`git add <arquivo>`) enquanto `.dev-ai-first/` estiver fora do `.gitignore`.
+- **Rode um comando por chamada, com caminho absoluto:** `bash /caminho/da/skill/scripts/x.sh <projeto>`. Comando composto (`cd x && ...`) costuma cair fora das permissões liberadas pelo dev.
 
 Caminhos como `scripts/...`, `references/...` e `assets/...` são relativos à pasta deste `SKILL.md`. Os scripts aceitam `--help`.
 
@@ -59,6 +59,7 @@ A saída traz `situacao` (`vazio`, `codigo`, `governado` ou `preparado`), lingua
 | uma demanda, história, bug ou tarefa | qualquer | [references/entregar.md](references/entregar.md); em `vazio` ou `codigo`, ofereça preparar antes, sem insistir |
 | `retomar` | qualquer | [references/entregar.md](references/entregar.md) §Retomar |
 | `revisar` | qualquer | [references/revisar.md](references/revisar.md) |
+| `retro` (só quando o dev pedir) | qualquer | [references/retro.md](references/retro.md) |
 | `pr` | qualquer | [references/pr.md](references/pr.md) |
 
 Sem argumento e sem pedido claro: mostre a situação detectada e pergunte qual modo, com a recomendação.

@@ -179,6 +179,74 @@
           "text": "Em app/ só mudou pedidos.py e erros.py (relatório e repositório intactos); scripts/ e tests/test_relatorio.py intactos"
         }
       ]
+    },
+    {
+      "id": "entregar-regra-agents",
+      "prompt": "Novo tipo de cupom `progressivo`: dá 5% de desconto a cada R$ 100,00 inteiros do subtotal, até no máximo 20%. O campo `valor` não é usado nesse tipo. O dev não está disponível para perguntas: siga as recomendações e registre as suposições. Não faça commit.",
+      "expected_output": "Cupom progressivo correto e a regra do time (auditoria do desconto) seguida; a regra está no AGENTS.md.",
+      "files": [
+        "projetos/pedidos",
+        "projetos/regra-a"
+      ],
+      "escopo_app": [
+        "app/pedidos.py"
+      ],
+      "assertions": [
+        {
+          "id": "check_verde",
+          "text": "bash scripts/check.sh passa"
+        },
+        {
+          "id": "corrigido_progressivo",
+          "text": "Teste oculto: 5% por R$ 100 inteiros, teto de 20%, abaixo de R$ 100 sem desconto"
+        },
+        {
+          "id": "regra_do_time",
+          "text": "Aplicar o cupom progressivo registra o desconto em app/auditoria.py"
+        },
+        {
+          "id": "teste_reproduz",
+          "text": "Os testes do workspace falham contra o app/ original"
+        },
+        {
+          "id": "escopo",
+          "text": "Em app/ só mudou app/pedidos.py (auditoria e regras antigas intactas); scripts/ e tests/test_relatorio.py intactos"
+        }
+      ]
+    },
+    {
+      "id": "entregar-regra-revisao",
+      "prompt": "Novo tipo de cupom `progressivo`: dá 5% de desconto a cada R$ 100,00 inteiros do subtotal, até no máximo 20%. O campo `valor` não é usado nesse tipo. O dev não está disponível para perguntas: siga as recomendações e registre as suposições. Não faça commit.",
+      "expected_output": "Cupom progressivo correto e a regra do time (auditoria do desconto) seguida; a regra está só em docs/PADROES.md, apontado no AGENTS.md para a revisão.",
+      "files": [
+        "projetos/pedidos",
+        "projetos/regra-b"
+      ],
+      "escopo_app": [
+        "app/pedidos.py"
+      ],
+      "assertions": [
+        {
+          "id": "check_verde",
+          "text": "bash scripts/check.sh passa"
+        },
+        {
+          "id": "corrigido_progressivo",
+          "text": "Teste oculto: 5% por R$ 100 inteiros, teto de 20%, abaixo de R$ 100 sem desconto"
+        },
+        {
+          "id": "regra_do_time",
+          "text": "Aplicar o cupom progressivo registra o desconto em app/auditoria.py"
+        },
+        {
+          "id": "teste_reproduz",
+          "text": "Os testes do workspace falham contra o app/ original"
+        },
+        {
+          "id": "escopo",
+          "text": "Em app/ só mudou app/pedidos.py (auditoria e regras antigas intactas); scripts/ e tests/test_relatorio.py intactos"
+        }
+      ]
     }
   ]
 }

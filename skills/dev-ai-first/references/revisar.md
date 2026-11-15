@@ -11,17 +11,21 @@ O pedido é autossuficiente e leva **só**:
 
 **Não** leve as justificativas do autor, o que já foi discutido nem o que aceitar.
 
+Demanda grande: dois revisores em paralelo, um por eixo (Demanda e Padrões), cada um com o mesmo pedido e só o seu bloco.
+
 ## Instruções para o revisor
 
 Copie para o pedido:
 
 > Revise o diff abaixo deste repositório. Leia `AGENTS.md` e siga a seção "Revisão de código" do `CONTRIBUTING.md`. Se o projeto não tiver essas seções, olhe nesta ordem: correção (faz o que a demanda pede? casos de borda e de erro?), design (fronteiras e responsabilidades seguidas pelo código vizinho, regra de negócio no lugar certo, recurso do framework em vez de solução própria), testes (cada critério tem teste que falharia se ele fosse falso?), segurança e dados, código típico de IA (abstração especulativa, comentário que repete o código, erro tratado de forma genérica, duplicação do que já existe), gambiarras (teste pulado, lint desativado, tipo frouxo), API obsoleta para a versão instalada.
 >
-> Responda em dois blocos separados:
-> 1. **Decidido x feito:** cada critério e decisão da tabela, marcado **atendido**, **parcial** ou **ausente**, citando a linha; e o que o diff faz sem ter sido pedido.
-> 2. **Achados:** prefixados `bloqueante:`, `sugestão:` ou `dúvida:`, cada um com `arquivo:linha` ou link da documentação oficial; achado grave descreve o cenário concreto de falha. Procure no diff cada item de "Perguntar antes" do `AGENTS.md` (dependência, migração, contrato, configuração de verificação, convenção, interface nova, infraestrutura): ocorrência sem autorização registrada é `bloqueante:`.
+> Não chame a skill dev-ai-first nem crie subagentes: revise você mesmo.
 >
-> Não comente o que o lint ou o CI já pegam. Zero achados é um resultado válido. Termine com um veredito: **pronto**, **mudanças** (lista dos `bloqueante:`) ou **precisa de decisão** (cada decisão com a recomendação). Não edite arquivos.
+> Responda em dois blocos separados, cada um com o seu veredito (um eixo que passa não esconde o que falha):
+> 1. **Demanda (decidido x feito):** cada critério e decisão da tabela, marcado **atendido**, **parcial** ou **ausente**, citando a linha; e o que o diff faz sem ter sido pedido.
+> 2. **Padrões (achados):** prefixados `bloqueante:`, `sugestão:` ou `dúvida:`, cada um com `arquivo:linha` ou link da documentação oficial; achado grave descreve o cenário concreto de falha. Procure no diff cada item de "Perguntar antes" do `AGENTS.md` (dependência, migração, contrato, configuração de verificação, convenção, interface nova, infraestrutura): ocorrência sem autorização registrada é `bloqueante:`.
+>
+> Não comente o que o lint ou o CI já pegam. Zero achados é um resultado válido. Termine cada bloco com um veredito: **pronto**, **mudanças** (lista dos `bloqueante:`) ou **precisa de decisão** (cada decisão com a recomendação). Não edite arquivos.
 
 ## Depois da revisão
 1. Confira cada achado no código antes de agir: o revisor também erra. Descartou um? Diga por quê no arquivo da tarefa.
@@ -36,5 +40,5 @@ Ensino genérico, para quando o projeto não tiver regra própria; a regra do pr
 - **SOLID:** S, um motivo para mudar por classe; O, variação de comportamento por estratégia injetada, não `if/switch` crescente; L, toda implementação de uma interface (inclusive o fake) passa na mesma suíte de contrato; I, interfaces pequenas com nome de negócio; D, inversão só nas fronteiras externas.
 - **Demeter:** fale com vizinhos imediatos (`pedido.total()`, não `pedido.itens.map(...).reduce(...)` fora do agregado). **Tell, don't ask:** peça ao objeto para fazer, não decida por ele lendo o estado. **CQS:** um método altera estado ou devolve dado, não os dois. Composição antes de herança.
 - **Code smells → refatoração:** função longa → extrair; muitos parâmetros → objeto de parâmetros ou VO; obsessão por primitivos → VO; `switch` sobre tipo repetido → polimorfismo; inveja de recursos → mover método; campos sempre juntos → extrair VO; mudança divergente → dividir classe; cirurgia espalhada → reunir responsabilidade; número mágico → constante com nome; mesmo conceito com duas definições → consolidar; nome que mente (`existe(): void`, `listarTodos` que filtra) → renomear.
-- **Testes:** um comportamento por teste; nome que diz o cenário e o resultado; teste que falharia se a regra fosse falsa: se ele continuaria passando com a função devolvendo vazio, zero ou nada, é oco; sem `sleep` nem dependência de ordem; dublê só na fronteira.
+- **Testes:** um comportamento por teste; nome que diz o cenário e o resultado; teste que falharia se a regra fosse falsa: se ele continuaria passando com a função devolvendo vazio, zero ou nada, é oco; valor esperado vindo da demanda ou de um exemplo calculado, não da mesma fórmula do código; sem `sleep` nem dependência de ordem; dublê só na fronteira.
 - **Comentários:** explicam o porquê; comentário que repete o código, falso ou código comentado é achado.
