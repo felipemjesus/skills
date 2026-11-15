@@ -1,0 +1,50 @@
+{
+  "skill_name": "dev-ai-first",
+  "observacao": "Projetos sintéticos (projetos/). Cada caso roda com e sem a skill; rodar.py confere as asserções por script.",
+  "evals": [
+    {
+      "id": "preparar-codigo",
+      "prompt": "Prepare este repositório para ser desenvolvido com agentes de código. O dev não está disponível para perguntas: siga as recomendações e registre as suposições. Não faça commit.",
+      "expected_output": "AGENTS.md curto com o comando de verificação real e as regras que o código não mostra; nenhum código alterado; citações e links válidos.",
+      "files": ["projetos/pedidos"],
+      "assertions": [
+        {"id": "agents_existe", "text": "Existe AGENTS.md na raiz"},
+        {"id": "agents_curto", "text": "AGENTS.md tem no máximo 3 KB"},
+        {"id": "agents_comando", "text": "AGENTS.md cita o comando de verificação real (scripts/check.sh ou unittest)"},
+        {"id": "agents_regra_centavos", "text": "AGENTS.md registra que dinheiro é int em centavos"},
+        {"id": "sem_marcador_agente", "text": "Nenhum marcador {{AGENTE: ...}} sobrou"},
+        {"id": "citacoes_validas", "text": "verificar-citacoes.sh não acha citação errada"},
+        {"id": "links_validos", "text": "verificar-links.sh não acha link quebrado"},
+        {"id": "codigo_intacto", "text": "Nada mudou em app/, tests/ e scripts/"},
+        {"id": "principios_intactos", "text": "Se existe docs/PRINCIPIOS.md, é idêntico ao da skill"}
+      ]
+    },
+    {
+      "id": "preparar-governado",
+      "prompt": "Prepare este repositório para ser desenvolvido com agentes de código. O dev não está disponível para perguntas: siga as recomendações e registre as suposições. Não faça commit.",
+      "expected_output": "O AGENTS.md do time fica intacto; o que falta vira proposta; nenhum código alterado.",
+      "files": ["projetos/pedidos", "projetos/governado"],
+      "assertions": [
+        {"id": "agents_intacto", "text": "O AGENTS.md do time não foi alterado"},
+        {"id": "sem_marcador_agente", "text": "Nenhum marcador {{AGENTE: ...}} sobrou"},
+        {"id": "citacoes_validas", "text": "verificar-citacoes.sh não acha citação errada"},
+        {"id": "links_validos", "text": "verificar-links.sh não acha link quebrado"},
+        {"id": "codigo_intacto", "text": "Nada mudou em app/, tests/ e scripts/"},
+        {"id": "principios_intactos", "text": "Se existe docs/PRINCIPIOS.md, é idêntico ao da skill"}
+      ]
+    },
+    {
+      "id": "entregar-bug",
+      "prompt": "Bug: quando o pedido usa um cupom de valor fixo maior que o subtotal, o total fica negativo. O total nunca pode ser negativo; nesse caso deve ser zero. Corrija. O dev não está disponível para perguntas: siga as recomendações e registre as suposições. Não faça commit.",
+      "expected_output": "Teste que reproduz o bug (falha no código original), correção mínima em app/pedidos.py, verificação verde, nada fora do pedido.",
+      "files": ["projetos/pedidos"],
+      "assertions": [
+        {"id": "check_verde", "text": "bash scripts/check.sh passa"},
+        {"id": "corrigido", "text": "Teste oculto: cupom fixo maior que o subtotal dá 0; os outros casos não mudam"},
+        {"id": "teste_reproduz", "text": "Os testes do workspace falham contra o app/ original (o bug ficou coberto por teste)"},
+        {"id": "escopo", "text": "Só app/pedidos.py mudou em app/; scripts/ intacto"},
+        {"id": "sem_float", "text": "Nenhum float introduzido em app/"}
+      ]
+    }
+  ]
+}

@@ -2,25 +2,29 @@
 # Confere se os links relativos dos documentos Markdown apontam para arquivos
 # e âncoras que existem. Documento com link quebrado ensina caminho errado ao agente.
 #
-# Uso: verificar-links.sh [pasta] [--alterados [ref]]
+# Uso: verificar-links.sh [pasta] [--alterados [ref]] [--limite N]
 #   sem opção:    todos os .md da pasta
 #   --alterados:  só os .md alterados ou novos em relação a ref (padrão HEAD), num repositório git;
 #                 use para conferir o que você gerou sem herdar links quebrados antigos do projeto
-# Sai com código 1 se houver link quebrado (útil no CI).
+#   --limite N: imprime no máximo N links quebrados (padrão 50; 0 = todas); o resumo sai sempre
+# Códigos de saída: 0 ok; 1 há link quebrado (útil no CI); 2 uso errado (opção, pasta).
 # Ignora: links externos (http, mailto), links com marcador {{...}}, blocos de código e pastas de dependências.
 
 set -uo pipefail
+for _a in "$@"; do case "$_a" in -h|--help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac; done
 
-raiz='' alterados='' ref=HEAD
+raiz='' alterados='' ref=HEAD limite=50
 while [ $# -gt 0 ]; do
   case "$1" in
     --alterados) alterados=1
                  if [ $# -gt 1 ] && [ "${2#-}" = "$2" ] && [ ! -d "$2" ]; then ref="$2"; shift; fi
                  shift ;;
+    --limite) limite="${2:-}"; shift 2 || { echo "erro: --limite exige um número" >&2; exit 2; } ;;
     -*) echo "erro: opção desconhecida: $1" >&2; exit 2 ;;
     *) [ -z "$raiz" ] || { echo "erro: mais de uma pasta informada" >&2; exit 2; }; raiz="$1"; shift ;;
   esac
 done
+case "$limite" in ''|*[!0-9]*) echo "erro: --limite exige um número" >&2; exit 2 ;; esac
 raiz="${raiz:-.}"
 cd "$raiz" || exit 2
 
@@ -32,12 +36,14 @@ else
   lista=$(find . \( -name node_modules -o -name vendor -o -name .git \) -prune -o -type f -name '*.md' -print | sed 's|^\./||')
 fi
 
-printf '%s\n' "$lista" | grep -v '^$' | perl -CO -Mutf8 -e '
+printf '%s\n' "$lista" | grep -v '^$' | LIMITE="$limite" perl -CO -Mutf8 -e '
   use strict; use warnings;
   use Encode qw(decode);
   use File::Basename qw(dirname);
   use File::Spec;
   my %ancoras;  # cache: arquivo -> { slug => 1 }
+  my ($lim, $impressos, $omitidos) = ($ENV{LIMITE} // 50, 0, 0);
+  sub relata { if (!$lim || $impressos < $lim) { print @_; $impressos++ } else { $omitidos++ } }
 
   sub slug {
     my $t = lc shift;
@@ -80,13 +86,14 @@ printf '%s\n' "$lista" | grep -v '^$' | perl -CO -Mutf8 -e '
         $total++;
         my ($caminho, $ancora) = split /#/, $link, 2;
         my $alvo = $caminho eq "" ? $arq : File::Spec->catfile($dir, Encode::encode("UTF-8", $caminho));
-        if (!-e $alvo) { print "$nome: arquivo não existe: $link\n"; $quebrados++; next }
+        if (!-e $alvo) { relata "$nome: arquivo não existe: $link\n"; $quebrados++; next }
         if (defined $ancora && $ancora ne "" && -f $alvo && !ancoras_de($alvo)->{$ancora}) {
-          print "$nome: âncora não existe: $link\n"; $quebrados++;
+          relata "$nome: âncora não existe: $link\n"; $quebrados++;
         }
       }
     }
   }
+  print "... (+$omitidos linhas; --limite 0 para todas)\n" if $omitidos;
   print "links verificados: $total, quebrados: $quebrados\n";
   exit($quebrados ? 1 : 0);
 '

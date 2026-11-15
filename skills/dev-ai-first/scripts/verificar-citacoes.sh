@@ -5,26 +5,30 @@
 #   aviso: nome ilustrativo do kit (assets/kit-exemplos.txt) que não aparece no código: exemplo que sobrou
 # Citação errada é afirmação falsa que o próximo agente vai seguir.
 #
-# Uso: verificar-citacoes.sh [pasta] [--alterados [ref]] [--mostrar]
+# Uso: verificar-citacoes.sh [pasta] [--alterados [ref]] [--mostrar] [--limite N]
 #   --alterados: só os .md alterados ou novos em relação a ref (padrão HEAD), num repositório git
 #   --mostrar:   imprime o conteúdo de cada linha citada, para conferir se ela diz o que o documento afirma
 # Caminho relativo a uma subpasta (ex.: raiz do frontend) é aceito se existir um único caminho do projeto que termine nele.
-# Sai com código 1 se houver erro ou exemplo do kit sobrando; avisos de caminho não reprovam.
+#   --limite N: no máximo N linhas de cada tipo (erro, aviso, --mostrar); padrão 50, 0 = todas; o resumo sai sempre
+# Códigos de saída: 0 ok; 1 há citação errada ou exemplo do kit sobrando (avisos de caminho não reprovam); 2 uso errado (opção, pasta).
 
 set -uo pipefail
+for _a in "$@"; do case "$_a" in -h|--help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac; done
 
 skill="$(cd "$(dirname "$0")/.." && pwd)"
-raiz='' alterados='' ref=HEAD mostrar=''
+raiz='' alterados='' ref=HEAD mostrar='' limite=50
 while [ $# -gt 0 ]; do
   case "$1" in
     --mostrar) mostrar=1; shift ;;
     --alterados) alterados=1
                  if [ $# -gt 1 ] && [ "${2#-}" = "$2" ] && [ ! -d "$2" ]; then ref="$2"; shift; fi
                  shift ;;
+    --limite) limite="${2:-}"; shift 2 || { echo "erro: --limite exige um número" >&2; exit 2; } ;;
     -*) echo "erro: opção desconhecida: $1" >&2; exit 2 ;;
     *) [ -z "$raiz" ] || { echo "erro: mais de uma pasta informada" >&2; exit 2; }; raiz="$1"; shift ;;
   esac
 done
+case "$limite" in ''|*[!0-9]*) echo "erro: --limite exige um número" >&2; exit 2 ;; esac
 raiz="${raiz:-.}"
 cd "$raiz" || exit 2
 
@@ -51,7 +55,7 @@ caminhos=$(find . \( -name node_modules -o -name vendor -o -name .git \) -prune 
 pacotes=$(cat package.json composer.json */package.json */composer.json 2>/dev/null | grep -oE '"[@a-z0-9._-]+/[a-z0-9._-]+"' | tr -d '"' | sort -u || true)
 branches=$(git for-each-ref --format='%(refname:short)' refs/heads 2>/dev/null || true)
 
-printf '%s\n' "$lista" | grep -v '^$' | CAMINHOS="$caminhos" PACOTES="$pacotes" BRANCHES="$branches" MOSTRAR="$mostrar" AUSENTES="$ausentes" perl -CO -Mutf8 -e '
+printf '%s\n' "$lista" | grep -v '^$' | CAMINHOS="$caminhos" PACOTES="$pacotes" BRANCHES="$branches" LIMITE="$limite" MOSTRAR="$mostrar" AUSENTES="$ausentes" perl -CO -Mutf8 -e '
   use strict; use warnings;
   use Encode qw(decode encode);
   use File::Basename qw(dirname);
@@ -72,6 +76,9 @@ printf '%s\n' "$lista" | grep -v '^$' | CAMINHOS="$caminhos" PACOTES="$pacotes" 
   # Nunca imprimir segredo: linha que pareça conter credencial sai mascarada no --mostrar.
   my $segredo = qr{-----BEGIN [A-Z ]*PRIVATE KEY-----|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36}|glpat-[A-Za-z0-9_-]{20}|xox[baprs]-|://[^/\s:@]+:[^/\s@]{6,}@|(?i:password|passwd|senha|secret|api[_-]?key|access[_-]?token|private[_-]?key)\W{0,3}\s*[:=>]};
   my %linhas;  # cache: arquivo -> nº de linhas
+  # Erros, avisos e linhas do --mostrar têm cada um o seu limite: aviso nunca esconde erro.
+  my ($lim, $omitidos, %impressos) = ($ENV{LIMITE} // 50, 0);
+  sub relata { my $tipo = shift; if (!$lim || ($impressos{$tipo} // 0) < $lim) { print @_; $impressos{$tipo}++ } else { $omitidos++ } }
   sub n_linhas {
     my $f = shift;
     return $linhas{$f} if exists $linhas{$f};
@@ -110,16 +117,16 @@ printf '%s\n' "$lista" | grep -v '^$' | CAMINHOS="$caminhos" PACOTES="$pacotes" 
         my $alvo = resolve($c, $dir);
         if (!$alvo) {
           next if $c !~ m{/};
-          $n_cit++; $erros++; print "$nome:$num: erro: arquivo citado não existe: $c:$ini\n"; next;
+          $n_cit++; $erros++; relata "erro", "$nome:$num: erro: arquivo citado não existe: $c:$ini\n"; next;
         }
         $n_cit++;
         my $n = n_linhas($alvo);
         if ($ini < 1 || $fim > $n || $fim < $ini) {
-          $erros++; print "$nome:$num: erro: linha fora do arquivo ($n linhas): $c:$ini", ($fim != $ini ? "-$fim" : ""), "\n";
+          $erros++; relata "erro", "$nome:$num: erro: linha fora do arquivo ($n linhas): $c:$ini", ($fim != $ini ? "-$fim" : ""), "\n";
         } elsif ($ENV{MOSTRAR}) {
           if (open my $cf, "<", $alvo) {
             my $k = 0;
-            while (my $t = <$cf>) { next unless ++$k == $ini; $t = decode("UTF-8", $t); $t =~ s/^\s+|\s+$//g; $t = "[linha com possível segredo: conteúdo omitido]" if $t =~ $segredo; print "$nome:$num: $c:$ini => ", substr($t, 0, 140), "\n"; last }
+            while (my $t = <$cf>) { next unless ++$k == $ini; $t = decode("UTF-8", $t); $t =~ s/^\s+|\s+$//g; $t = "[linha com possível segredo: conteúdo omitido]" if $t =~ $segredo; relata "mostrar", "$nome:$num: $c:$ini => ", substr($t, 0, 140), "\n"; last }
           }
         }
       }
@@ -130,15 +137,16 @@ printf '%s\n' "$lista" | grep -v '^$' | CAMINHOS="$caminhos" PACOTES="$pacotes" 
         $c =~ s{/$}{};
         next if $ignorar{$c} || resolve($c, $dir);
         next if $c !~ m{/} && $nome{$c};  # nome de pasta citado sozinho (`x/`), que existe no projeto
-        $avisos++; print "$nome:$num: aviso: caminho não existe: $c\n";
+        $avisos++; relata "aviso", "$nome:$num: aviso: caminho não existe: $c\n";
       }
       for my $t (@ausentes) {
         if ($l =~ /(?<![\p{L}\p{N}_])\Q$t\E(?![\p{L}\p{N}_])/) {
-          $sobras++; print "$nome:$num: erro: exemplo do kit que não existe no projeto: $t\n";
+          $sobras++; relata "erro", "$nome:$num: erro: exemplo do kit que não existe no projeto: $t\n";
         }
       }
     }
   }
+  print "... (+$omitidos linhas; --limite 0 para todas)\n" if $omitidos;
   print "citacoes arquivo:linha: $n_cit, erros: $erros; caminhos inexistentes (aviso): $avisos; exemplos do kit sobrando: $sobras\n";
   exit(($erros || $sobras) ? 1 : 0);
 '

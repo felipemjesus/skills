@@ -1,0 +1,25 @@
+{
+  "observacao": "Teste de ativação da descrição: cada pedido roda 3 vezes; ativou se a taxa > 0,5. Ajuste a descrição olhando só 'treino'; escolha a versão pela taxa de acerto em 'validacao'.",
+  "pedidos": [
+    {"texto": "prepare este repositório para trabalhar com agentes de código", "ativar": true, "grupo": "treino"},
+    {"texto": "cria um AGENTS.md para este projeto", "ativar": true, "grupo": "treino"},
+    {"texto": "implementa a história: o cliente pode cancelar um pedido em até 24 horas", "ativar": true, "grupo": "treino"},
+    {"texto": "tem um bug: o total do carrinho fica negativo com cupom, corrige", "ativar": true, "grupo": "treino"},
+    {"texto": "retoma a tarefa que eu estava fazendo nesta branch", "ativar": true, "grupo": "treino"},
+    {"texto": "make this repo agent-ready", "ativar": true, "grupo": "treino"},
+    {"texto": "escreve a descrição do PR desta branch", "ativar": true, "grupo": "validacao"},
+    {"texto": "revise o diff desta branch contra os critérios da demanda", "ativar": true, "grupo": "validacao"},
+    {"texto": "quero deixar o projeto AI first, por onde começo?", "ativar": true, "grupo": "validacao"},
+    {"texto": "implement this ticket: add pagination to the orders endpoint", "ativar": true, "grupo": "validacao"},
+    {"texto": "explique o que faz esta função em Python: def f(x): return x * 2", "ativar": false, "grupo": "treino"},
+    {"texto": "o que é arquitetura hexagonal?", "ativar": false, "grupo": "treino"},
+    {"texto": "revise este texto de e-mail para o cliente: 'Prezado, segue a proposta.'", "ativar": false, "grupo": "treino"},
+    {"texto": "qual a diferença entre git merge e git rebase?", "ativar": false, "grupo": "treino"},
+    {"texto": "gere uma expressão regular para validar CEP", "ativar": false, "grupo": "treino"},
+    {"texto": "o que significa o erro ECONNREFUSED no Node?", "ativar": false, "grupo": "treino"},
+    {"texto": "escreva uma descrição para este produto da loja: caneca de cerâmica 300 ml", "ativar": false, "grupo": "validacao"},
+    {"texto": "summarize the main ideas of domain-driven design in three bullets", "ativar": false, "grupo": "validacao"},
+    {"texto": "traduza para inglês: o sistema ficou fora do ar por dez minutos", "ativar": false, "grupo": "validacao"},
+    {"texto": "write a haiku about code reviews", "ativar": false, "grupo": "validacao"}
+  ]
+}

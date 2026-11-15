@@ -198,9 +198,52 @@ Lições:
 
 **Limites:** 3 projetos e uma execução por braço, demandas pequenas, juiz e implementador do mesmo fabricante de modelo, e parte dos projetos sem como rodar o backend.
 
+### 6. Alinhamento com o padrão Agent Skills (14/11)
+
+O [agentskills.io](https://agentskills.io) reúne a especificação e as boas práticas do formato. O cabeçalho e o tamanho do `SKILL.md` já seguiam o padrão. Três ajustes vieram dele:
+
+- **Armadilhas no `SKILL.md`.** Os 10 erros que agentes cometeram nas rodadas 1 a 4 agora ficam no próprio `SKILL.md`, cada um com a correção: editar os princípios, rodar `--fix`, consertar o que está fora do pedido, entre outros. As linhas repetidas saíram das referências. O site diz que essa lista costuma ser o conteúdo de maior valor de uma skill.
+- **Scripts feitos para agentes:**
+  - `--help` em todos;
+  - códigos de saída documentados (0, 1, 2);
+  - `--limite N` nas listagens (padrão 50, com o resumo sempre impresso), porque os agentes cortam saídas grandes;
+  - aviso nunca esconde erro.
+  
+  Na revisão também apareceram as indicações de próximo passo do detector, que apontavam para seções que tinham mudado de arquivo.
+- **Avaliação repetível, sem projetos reais.** Em [evals/dev-ai-first](../evals/dev-ai-first/README.md) há:
+  - 3 casos num projeto sintético, rodados com e sem a skill;
+  - asserções conferidas por script;
+  - um `benchmark.json` com acerto, tokens e tempo;
+  - um teste de ativação da descrição com 20 pedidos.
+
+Primeira rodada (uma execução por braço):
+
+| Caso | Acerto (com / sem) | Tokens (com / sem) |
+|---|---|---|
+| preparar um projeto com código | 9/9 · 9/9 | 562 mil · 213 mil |
+| preparar um projeto já governado | 6/6 · **5/6** (o agente puro alterou o `AGENTS.md` do time) | 518 mil · 165 mil |
+| corrigir um bug | 5/5 · 5/5 | 335 mil · 243 mil |
+
+Os tokens incluem a leitura de cache.
+
+| Teste de ativação | Resultado |
+|---|---|
+| Treino | 11 de 12 |
+| Validação | 8 de 8 |
+| Pedidos parecidos que não devem ativar a skill | nenhum ativou |
+| Pedido que falhou | um pedido curto de correção de bug, que ativou 1 vez em 3 |
+
+**Leitura:**
+- **Projeto pequeno e limpo:** a skill custa 2 a 3 vezes mais tokens e quase não muda o acerto. É o esperado: nas rodadas com projetos reais, a diferença apareceu onde havia risco, como falta de teste ou configuração quebrada.
+- **Casos fáceis demais:** a maioria das asserções passa nos dois braços, e o site manda retirar asserção que não discrimina. A próxima iteração precisa de casos mais difíceis:
+  - uma decisão de negócio que exige pergunta;
+  - duas formas convivendo no código;
+  - configuração quebrada fora do pedido.
+
 ## Próximos passos
 
 - Kit `aplicacao-de-ia` (prompts versionados, evals, guardrails) como modo opcional, para produtos com LLM.
 - Kits prontos de TypeScript e PHP como referência quando a stack bate.
 - `sincronizar`: apontar a documentação que o diff deixou desatualizada, no CI.
 - Repetir a avaliação A/B com mais projetos e demandas maiores, e com juiz de outro fabricante de modelo.
+- Evals sintéticos mais difíceis, que discriminem a skill (decisão que exige pergunta, padrão ambíguo, configuração quebrada fora do pedido), e várias execuções por braço.
