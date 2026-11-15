@@ -240,10 +240,39 @@ Os tokens incluem a leitura de cache.
   - duas formas convivendo no código;
   - configuração quebrada fora do pedido.
 
+### 7. Ideias do ub-mode (14/11)
+
+O [ub-mode](https://github.com/unclebob/ub-mode), de Robert C. Martin, é uma skill de 4 KB com três fases: *Make it Work*, *Make it Right* e *Practice*. Muito dela a skill já fazia: o teste que falha pelo motivo certo, a causa raiz, a fronteira para integrações e os commits com evidência. Entrou o que faltava, em poucas linhas:
+
+- **Teste oco** (`entregar.md`, `revisar.md`, `PRINCIPIOS.md`): o teste que continuaria passando com a função devolvendo vazio, zero ou nada não prova nada.
+- **Teste honesto ou nenhum:** quando um teste honesto é impraticável, o agente diz o que não foi provado em vez de escrever um teste ruim.
+- **Disjuntor** (`entregar.md`): depois de duas correções seguidas que falham na mesma verificação, o agente escreve numa frase a premissa que as duas compartilham, confere essa premissa e replaneja.
+- **Princípios curtos** (`PRINCIPIOS.md`):
+  - código claro e local não se refatora por gosto;
+  - estado ilegal se recusa na criação;
+  - operação que pode repetir é idempotente.
+- **Gate por métrica como sugestão** (`IA_FIRST.md`, item 9): cobertura do diff, complexidade e mutação dos arquivos alterados, com o comando da stack. A skill propõe e não instala. O ub-mode manda usar as ferramentas sem dizer como; isso ficou de fora, assim como o push direto na main.
+
+**Evals:**
+- **Casos novos:** dois casos no projeto sintético.
+  - **Validade do cupom:** o harness verifica se cada teste novo falha em pelo menos um mutante (o código original, `total` devolvendo 0, `total` devolvendo o subtotal). É o critério do teste oco automatizado.
+  - **Recusa de quantidade inválida:** o erro precisa ser de domínio, e o relatório e o repositório ficam intactos.
+- **Rodada:** 5 casos, 2 execuções por braço.
+
+| | Acerto com a skill | Acerto sem a skill | Tokens com a skill |
+|---|---|---|---|
+| 3.1.0 (linha de base) | 100% | 95,6% | 373 mil |
+| **3.2.0** | **100%** | (o mesmo braço) | **352 mil (−5,5%)** |
+
+**Leitura:**
+- **Critério de aceite:** a 3.2.0 entra porque atende o critério: acerto igual e custo dentro do ruído.
+- **Onde o agente puro falhou:** alterou o `AGENTS.md` do time nas 2 execuções do projeto governado, e numa execução do projeto com código passou do tamanho.
+- **Casos ainda fáceis:** os casos de entrega continuam não separando os braços. Um modelo atual já escreve teste bom num projeto pequeno e limpo. Para medir o disjuntor e o teste oco, os casos precisam de um ambiente que engane: uma premissa falsa no código ou um teste existente que mente.
+
 ## Próximos passos
 
 - Kit `aplicacao-de-ia` (prompts versionados, evals, guardrails) como modo opcional, para produtos com LLM.
 - Kits prontos de TypeScript e PHP como referência quando a stack bate.
 - `sincronizar`: apontar a documentação que o diff deixou desatualizada, no CI.
 - Repetir a avaliação A/B com mais projetos e demandas maiores, e com juiz de outro fabricante de modelo.
-- Evals sintéticos mais difíceis, que discriminem a skill (decisão que exige pergunta, padrão ambíguo, configuração quebrada fora do pedido), e várias execuções por braço.
+- Evals sintéticos que discriminem a skill: premissa falsa plantada no código (para o disjuntor), teste existente que mente, decisão que exige pergunta, configuração quebrada fora do pedido.

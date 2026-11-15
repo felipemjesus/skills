@@ -2,14 +2,14 @@
 """Roda os casos de evals.json com e sem a skill e confere as asserções por script.
 
 Uso: python3 -I evals/dev-ai-first/rodar.py --saida <pasta> [--casos a,b] [--bracos com,sem]
-                                            [--modelo M] [--paralelo N] [--so-conferir]
+                                            [--execucoes N] [--modelo M] [--paralelo N] [--so-conferir]
 
-Para cada caso e braço cria <saida>/<caso>/<braco>/ com:
+Para cada caso, braço e execução cria <saida>/<caso>/<braco>/exec-<k>/ com:
   projeto/       cópia do projeto sintético, num repositório git com um commit
   saida.json     resposta do `claude -p --output-format json`
   timing.json    total_tokens, duration_ms, custo_usd
   grading.json   cada asserção com passou/evidência
-e grava <saida>/benchmark.json com média e desvio por braço e o delta (com − sem).
+e grava <saida>/benchmark.json com a média por caso e braço, média e desvio por braço e o delta (com − sem).
 --so-conferir refaz só as asserções e o benchmark, sem chamar o agente.
 Gasta tokens da conta do Claude Code: rode sob demanda, nunca no CI.
 Códigos de saída: 0 ok; 2 uso errado.
@@ -188,9 +188,10 @@ def a_teste_reproduz(p):
     return r.returncode != 0, "algum teste falha no código original" if r.returncode else "todos passam no código original"
 
 
-def a_escopo(p):
-    fora = [l for l in _status(p, "app", "scripts") if not l.endswith("app/pedidos.py")]
-    return not fora, "; ".join(fora) or "só app/pedidos.py"
+def a_escopo(p, caso):
+    permitido = caso.get("escopo_app", ["app/pedidos.py"])
+    fora = [l for l in _status(p, "app", "scripts", "tests/test_relatorio.py") if l[3:] not in permitido]
+    return not fora, "; ".join(fora) or "só " + ", ".join(permitido)
 
 
 def a_sem_float(p):
@@ -199,12 +200,100 @@ def a_sem_float(p):
     return not novas, "; ".join(novas) or "nenhum float novo"
 
 
+OCULTO_VALIDADE = """
+from datetime import date
+from app.pedidos import Cupom, Item, Pedido, total
+p = lambda c: Pedido(id="x", itens=[Item("a", 1, 1000)], cupom=c)
+d = date(2026, 3, 10)
+assert total(p(Cupom("V", "percentual", 10, validade=d)), hoje=date(2026, 3, 11)) == 1000, "vencido deveria dar o subtotal"
+assert total(p(Cupom("V", "fixo", 300, validade=d)), hoje=date(2026, 3, 11)) == 1000, "vencido (fixo) deveria dar o subtotal"
+assert total(p(Cupom("V", "percentual", 10, validade=d)), hoje=d) == 900, "no último dia o cupom vale"
+assert total(p(Cupom("V", "percentual", 10)), hoje=date(2030, 1, 1)) == 900, "sem validade o cupom vale"
+assert total(p(None)) == 1000
+"""
+
+OCULTO_QUANTIDADE = """
+from app.erros import ErroDeDominio
+from app.pedidos import Item, Pedido, total
+from app.repositorio import RepositorioDePedidos
+def recusa(q):
+    try:
+        p = Pedido(id="x", itens=[Item("a", q, 100)])
+        RepositorioDePedidos().salvar(p)
+        total(p)
+    except ErroDeDominio:
+        return True
+    return False
+assert recusa(0), "quantidade 0 deveria ser recusada com ErroDeDominio"
+assert recusa(-1), "quantidade -1 deveria ser recusada com ErroDeDominio"
+assert not recusa(1), "quantidade 1 deveria passar"
+"""
+
+
+def _oculto(p, codigo):
+    r = sh([sys.executable, "-I", "-c", "import sys; sys.path.insert(0, '.')\n" + codigo], p)
+    return r.returncode == 0, "teste oculto passou" if r.returncode == 0 else (r.stderr.strip().splitlines() or ["falhou"])[-1]
+
+
+def a_corrigido_validade(p):
+    return _oculto(p, OCULTO_VALIDADE)
+
+
+def a_recusa_quantidade(p):
+    return _oculto(p, OCULTO_QUANTIDADE)
+
+
+LISTAR_TESTES = """
+import unittest
+def ids(s):
+    for t in s:
+        if isinstance(t, unittest.TestSuite):
+            yield from ids(t)
+        else:
+            yield t.id()
+print("\\n".join(ids(unittest.defaultTestLoader.discover("tests", top_level_dir="."))))
+"""
+MUTANTES = {
+    "total devolve 0": "\n\ndef total(pedido, hoje=None):\n    return 0\n",
+    "total devolve o subtotal": "\n\ndef total(pedido, hoje=None):\n    return subtotal(pedido)\n",
+}
+
+
+def _ids_de_teste(pasta):
+    r = sh([sys.executable, "-c", LISTAR_TESTES], pasta)
+    return {i for i in r.stdout.split() if i and "_FailedTest" not in i}
+
+
+def a_testes_novos_nao_ocos(p):
+    """Teste novo que passa no código original e nos mutantes não prova nada: é oco."""
+    novos = sorted(_ids_de_teste(p) - _ids_de_teste(BASE))
+    if not novos:
+        return False, "nenhum teste novo"
+    with tempfile.TemporaryDirectory() as tmp:
+        variantes = {}
+        original = pathlib.Path(tmp) / "original"
+        shutil.copytree(p, original, ignore=shutil.ignore_patterns(".git", "__pycache__"))
+        shutil.rmtree(original / "app")
+        shutil.copytree(BASE / "app", original / "app")
+        variantes["código original"] = original
+        for nome, corpo in MUTANTES.items():
+            m = pathlib.Path(tmp) / nome.replace(" ", "-")
+            shutil.copytree(p, m, ignore=shutil.ignore_patterns(".git", "__pycache__"))
+            with open(m / "app" / "pedidos.py", "a", encoding="utf-8") as f:
+                f.write(corpo)
+            variantes[nome] = m
+        ocos = [t for t in novos
+                if all(sh([sys.executable, "-m", "unittest", t], pasta).returncode == 0 for pasta in variantes.values())]
+    return not ocos, (f"ocos: {', '.join(ocos)}" if ocos else f"{len(novos)} testes novos, todos falham em algum mutante")
+
+
 def conferir(caso, pasta: pathlib.Path):
     p = pasta / "projeto"
     resultado = []
     for a in caso["assertions"]:
         try:
-            ok, evid = globals()["a_" + a["id"]](p)
+            f = globals()["a_" + a["id"]]
+            ok, evid = f(p, caso) if f.__code__.co_argcount == 2 else f(p)
         except Exception as e:  # asserção que quebra conta como falha, com o motivo
             ok, evid = False, f"erro ao conferir: {e}"
         resultado.append({"id": a["id"], "text": a["text"], "passed": bool(ok), "evidence": evid})
@@ -225,6 +314,7 @@ def main():
     ap.add_argument("--saida", required=True)
     ap.add_argument("--casos")
     ap.add_argument("--bracos", default="com,sem")
+    ap.add_argument("--execucoes", type=int, default=1)
     ap.add_argument("--modelo")
     ap.add_argument("--paralelo", type=int, default=2)
     ap.add_argument("--so-conferir", action="store_true")
@@ -241,7 +331,7 @@ def main():
     if set(bracos) - {"com", "sem"}:
         ap.error("--bracos aceita com e sem")
     saida = pathlib.Path(args.saida).resolve()
-    tarefas = [(c, b, saida / c["id"] / b) for c in casos for b in bracos]
+    tarefas = [(c, b, saida / c["id"] / b / f"exec-{k}") for c in casos for b in bracos for k in range(1, args.execucoes + 1)]
 
     if not args.so_conferir:
         for c, _, pasta in tarefas:
@@ -254,18 +344,23 @@ def main():
                 print(f"rodou: {futuros[f][0]} / {futuros[f][1]}", file=sys.stderr)
 
     bench = {"skill_name": "dev-ai-first", "casos": {}, "bracos": {}}
+    execucoes = {}  # (caso, braço) -> lista de medições
     for c, b, pasta in tarefas:
         taxa = conferir(c, pasta)
         t = json.loads((pasta / "timing.json").read_text(encoding="utf-8")) if (pasta / "timing.json").exists() else {}
-        bench["casos"].setdefault(c["id"], {})[b] = {"pass_rate": round(taxa, 3), "total_tokens": t.get("total_tokens"),
-                                                    "duration_ms": t.get("duration_ms")}
+        execucoes.setdefault((c["id"], b), []).append({"pass_rate": taxa, "total_tokens": t.get("total_tokens"),
+                                                       "duration_ms": t.get("duration_ms")})
+    metricas = ("pass_rate", "total_tokens", "duration_ms")
+    for (cid, b), medidas in execucoes.items():
+        bench["casos"].setdefault(cid, {})[b] = {k: resumo([m[k] for m in medidas])["media"] for k in metricas}
+        bench["casos"][cid][b]["execucoes"] = len(medidas)
     for b in bracos:
-        linhas = [v[b] for v in bench["casos"].values() if b in v]
-        bench["bracos"][b] = {k: resumo([l[k] for l in linhas]) for k in ("pass_rate", "total_tokens", "duration_ms")}
+        medidas = [m for (cid, bb), ms in execucoes.items() if bb == b for m in ms]
+        bench["bracos"][b] = {k: resumo([m[k] for m in medidas]) for k in metricas}
     if {"com", "sem"} <= set(bracos):
         bench["delta"] = {k: (None if bench["bracos"]["com"][k]["media"] is None or bench["bracos"]["sem"][k]["media"] is None
                               else round(bench["bracos"]["com"][k]["media"] - bench["bracos"]["sem"][k]["media"], 3))
-                          for k in ("pass_rate", "total_tokens", "duration_ms")}
+                          for k in metricas}
     (saida / "benchmark.json").write_text(json.dumps(bench, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(bench, indent=2, ensure_ascii=False))
 

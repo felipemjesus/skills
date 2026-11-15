@@ -16,7 +16,7 @@
 3. Faça o mínimo, no padrão do projeto.
 - Antes de criar, ache dois vizinhos do mesmo tipo e imite.
 - Procure antes de presumir: nome de API, campo, comando e regra se confirmam no código ou na documentação.
-- Não corrija vizinho fora do pedido; aponte e pergunte.
+- Não corrija vizinho fora do pedido; aponte e pergunte. Código claro e local não se refatora só porque poderia ser diferente.
 - Pronto é evidência: teste que falhou e passou, verificação rodada, sistema usado como o usuário usa.
 
 ## Responsabilidades por papel
@@ -65,6 +65,8 @@ exemplo: "estoque disponível" é um método de `Estoque`. Criar `Pedido` e conf
 
 Lógica de aplicação e de domínio fica em classes: cada regra tem um dono com nome, e as dependências aparecem no construtor. Funções soltas só na borda do framework: inicialização, configuração, callbacks exigidos por biblioteca, fábricas de dados de teste. O que seria utilitário vira value object, método do agregado ou serviço injetado. Nada de classe só com métodos estáticos nem objeto literal como namespace.
 
+Estado ilegal não se escreve: o tipo, o value object ou o construtor recusa o valor inválido na criação, em vez de cada uso checar depois.
+
 ## Nomes
 
 - Tipos em português com sufixo técnico em inglês, sem preposição nem artigo.
@@ -86,7 +88,7 @@ Toda exceção de domínio pertence a uma categoria fechada, e cada categoria te
 
 ## Testes primeiro
 
-Escreva o teste antes do código e veja-o falhar pelo motivo certo. Um comportamento por teste. Não enfraqueça teste para passar.
+Escreva o teste antes do código e veja-o falhar pelo motivo certo. Um comportamento por teste. Não enfraqueça teste para passar. Teste que continuaria passando com a função devolvendo nada não prova nada. Teste honesto impraticável? Não escreva um ruim: diga o que não foi provado.
 <!-- se: backend -->
 Os testes do caso de uso usam banco real, não mock do ORM.
 <!-- fim: backend -->
@@ -103,6 +105,7 @@ Falha de concorrência não avisa: cada transação sozinha parece correta.
 - Limite contado: contar e gravar na mesma transação, com trava da linha dona do limite ou restrição no banco.
 - Write skew: quando um caso de uso grava um fato e outro o lê como regra, os dois serializam no mesmo ponto (mesma trava ou restrição).
 - Cada caso tem um teste que dispara as operações em paralelo e falha sem a proteção.
+- Operação que pode repetir (retry, fila, reenvio do usuário) é idempotente: rodar duas vezes, ou de novo depois de uma queda no meio, termina no mesmo estado. Um teste roda duas vezes e confere.
 
 exemplo: estornar `Pagamento` e faturar `Pedido` travam a mesma linha do `Pedido`; sem isso, um pedido estornado pode ser faturado.
 <!-- fim: backend -->
