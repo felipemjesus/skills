@@ -6,44 +6,178 @@
       "id": "preparar-codigo",
       "prompt": "Prepare este repositório para ser desenvolvido com agentes de código. O dev não está disponível para perguntas: siga as recomendações e registre as suposições. Não faça commit.",
       "expected_output": "AGENTS.md curto com o comando de verificação real e as regras que o código não mostra; nenhum código alterado; citações e links válidos.",
-      "files": ["projetos/pedidos"],
+      "files": [
+        "projetos/pedidos"
+      ],
       "assertions": [
-        {"id": "agents_existe", "text": "Existe AGENTS.md na raiz"},
-        {"id": "agents_curto", "text": "AGENTS.md tem no máximo 3 KB"},
-        {"id": "agents_comando", "text": "AGENTS.md cita o comando de verificação real (scripts/check.sh ou unittest)"},
-        {"id": "agents_regra_centavos", "text": "AGENTS.md registra que dinheiro é int em centavos"},
-        {"id": "sem_marcador_agente", "text": "Nenhum marcador {{AGENTE: ...}} sobrou"},
-        {"id": "citacoes_validas", "text": "verificar-citacoes.sh não acha citação errada"},
-        {"id": "links_validos", "text": "verificar-links.sh não acha link quebrado"},
-        {"id": "codigo_intacto", "text": "Nada mudou em app/, tests/ e scripts/"},
-        {"id": "principios_intactos", "text": "Se existe docs/PRINCIPIOS.md, é idêntico ao da skill"}
+        {
+          "id": "agents_existe",
+          "text": "Existe AGENTS.md na raiz"
+        },
+        {
+          "id": "agents_curto",
+          "text": "AGENTS.md tem no máximo 3 KB"
+        },
+        {
+          "id": "agents_comando",
+          "text": "AGENTS.md cita o comando de verificação real (scripts/check.sh ou unittest)"
+        },
+        {
+          "id": "agents_regra_centavos",
+          "text": "AGENTS.md registra que dinheiro é int em centavos"
+        },
+        {
+          "id": "sem_marcador_agente",
+          "text": "Nenhum marcador {{AGENTE: ...}} sobrou"
+        },
+        {
+          "id": "citacoes_validas",
+          "text": "verificar-citacoes.sh não acha citação errada"
+        },
+        {
+          "id": "links_validos",
+          "text": "verificar-links.sh não acha link quebrado"
+        },
+        {
+          "id": "codigo_intacto",
+          "text": "Nada mudou em app/, tests/ e scripts/"
+        },
+        {
+          "id": "principios_intactos",
+          "text": "Se existe docs/PRINCIPIOS.md, é idêntico ao da skill"
+        }
       ]
     },
     {
       "id": "preparar-governado",
       "prompt": "Prepare este repositório para ser desenvolvido com agentes de código. O dev não está disponível para perguntas: siga as recomendações e registre as suposições. Não faça commit.",
       "expected_output": "O AGENTS.md do time fica intacto; o que falta vira proposta; nenhum código alterado.",
-      "files": ["projetos/pedidos", "projetos/governado"],
+      "files": [
+        "projetos/pedidos",
+        "projetos/governado"
+      ],
       "assertions": [
-        {"id": "agents_intacto", "text": "O AGENTS.md do time não foi alterado"},
-        {"id": "sem_marcador_agente", "text": "Nenhum marcador {{AGENTE: ...}} sobrou"},
-        {"id": "citacoes_validas", "text": "verificar-citacoes.sh não acha citação errada"},
-        {"id": "links_validos", "text": "verificar-links.sh não acha link quebrado"},
-        {"id": "codigo_intacto", "text": "Nada mudou em app/, tests/ e scripts/"},
-        {"id": "principios_intactos", "text": "Se existe docs/PRINCIPIOS.md, é idêntico ao da skill"}
+        {
+          "id": "agents_intacto",
+          "text": "O AGENTS.md do time não foi alterado"
+        },
+        {
+          "id": "sem_marcador_agente",
+          "text": "Nenhum marcador {{AGENTE: ...}} sobrou"
+        },
+        {
+          "id": "citacoes_validas",
+          "text": "verificar-citacoes.sh não acha citação errada"
+        },
+        {
+          "id": "links_validos",
+          "text": "verificar-links.sh não acha link quebrado"
+        },
+        {
+          "id": "codigo_intacto",
+          "text": "Nada mudou em app/, tests/ e scripts/"
+        },
+        {
+          "id": "principios_intactos",
+          "text": "Se existe docs/PRINCIPIOS.md, é idêntico ao da skill"
+        }
       ]
     },
     {
       "id": "entregar-bug",
       "prompt": "Bug: quando o pedido usa um cupom de valor fixo maior que o subtotal, o total fica negativo. O total nunca pode ser negativo; nesse caso deve ser zero. Corrija. O dev não está disponível para perguntas: siga as recomendações e registre as suposições. Não faça commit.",
       "expected_output": "Teste que reproduz o bug (falha no código original), correção mínima em app/pedidos.py, verificação verde, nada fora do pedido.",
-      "files": ["projetos/pedidos"],
+      "files": [
+        "projetos/pedidos"
+      ],
       "assertions": [
-        {"id": "check_verde", "text": "bash scripts/check.sh passa"},
-        {"id": "corrigido", "text": "Teste oculto: cupom fixo maior que o subtotal dá 0; os outros casos não mudam"},
-        {"id": "teste_reproduz", "text": "Os testes do workspace falham contra o app/ original (o bug ficou coberto por teste)"},
-        {"id": "escopo", "text": "Só app/pedidos.py mudou em app/; scripts/ intacto"},
-        {"id": "sem_float", "text": "Nenhum float introduzido em app/"}
+        {
+          "id": "check_verde",
+          "text": "bash scripts/check.sh passa"
+        },
+        {
+          "id": "corrigido",
+          "text": "Teste oculto: cupom fixo maior que o subtotal dá 0; os outros casos não mudam"
+        },
+        {
+          "id": "teste_reproduz",
+          "text": "Os testes do workspace falham contra o app/ original (o bug ficou coberto por teste)"
+        },
+        {
+          "id": "escopo",
+          "text": "Só app/pedidos.py mudou em app/; scripts/ intacto"
+        },
+        {
+          "id": "sem_float",
+          "text": "Nenhum float introduzido em app/"
+        }
+      ]
+    },
+    {
+      "id": "entregar-validade",
+      "prompt": "Cupom vencido não pode dar desconto: depois do último dia de validade, o total do pedido fica igual ao subtotal. Hoje a validade do cupom é ignorada. O dev não está disponível para perguntas: siga as recomendações e registre as suposições. Não faça commit.",
+      "expected_output": "Testes que provam a regra (falham no código original e não passam com total devolvendo 0 ou o subtotal), mudança só em app/pedidos.py, relatório e seu teste intocados.",
+      "files": [
+        "projetos/pedidos"
+      ],
+      "escopo_app": [
+        "app/pedidos.py"
+      ],
+      "assertions": [
+        {
+          "id": "check_verde",
+          "text": "bash scripts/check.sh passa"
+        },
+        {
+          "id": "corrigido_validade",
+          "text": "Teste oculto: vencido dá o subtotal; no último dia e sem validade, o desconto vale"
+        },
+        {
+          "id": "teste_reproduz",
+          "text": "Os testes do workspace falham contra o app/ original"
+        },
+        {
+          "id": "testes_novos_nao_ocos",
+          "text": "Cada teste novo falha em pelo menos um mutante (código original, total devolvendo 0, total devolvendo o subtotal)"
+        },
+        {
+          "id": "escopo",
+          "text": "Em app/ só mudou o permitido; scripts/ e tests/test_relatorio.py intactos"
+        },
+        {
+          "id": "sem_float",
+          "text": "Nenhum float introduzido em app/"
+        }
+      ]
+    },
+    {
+      "id": "entregar-quantidade",
+      "prompt": "Item com quantidade zero ou negativa deve ser recusado: hoje um pedido assim é aceito e o total sai errado. O dev não está disponível para perguntas: siga as recomendações e registre as suposições. Não faça commit.",
+      "expected_output": "Recusa como erro de domínio (herda ErroDeDominio) num ponto só, de preferência na construção do item; teste que falha no código original; nada duplicado em relatório ou repositório.",
+      "files": [
+        "projetos/pedidos"
+      ],
+      "escopo_app": [
+        "app/pedidos.py",
+        "app/erros.py"
+      ],
+      "assertions": [
+        {
+          "id": "check_verde",
+          "text": "bash scripts/check.sh passa"
+        },
+        {
+          "id": "recusa_quantidade",
+          "text": "Teste oculto: quantidade 0 e -1 levantam ErroDeDominio antes de salvar ou totalizar; quantidade 1 passa"
+        },
+        {
+          "id": "teste_reproduz",
+          "text": "Os testes do workspace falham contra o app/ original"
+        },
+        {
+          "id": "escopo",
+          "text": "Em app/ só mudou pedidos.py e erros.py (relatório e repositório intactos); scripts/ e tests/test_relatorio.py intactos"
+        }
       ]
     }
   ]

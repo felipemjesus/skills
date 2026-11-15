@@ -48,12 +48,15 @@ Demanda pequena e sem decisão: mostre o checklist e o plano em poucas linhas e 
 ## 3. Teste primeiro
 - Todo comportamento novo começa por um teste que **falha pelo motivo certo**: unitário no domínio e integração no caso de uso, conforme o `TESTING.md` do projeto.
 - **Bug:** o teste reproduz o sintoma exato relatado; hipóteses ordenadas antes de instrumentar; depois procure a mesma causa nos outros pontos que usam o conceito (`TESTING.md` §9 do projeto). Não reproduziu? Isso é o achado: relate e pergunte o dado que falta.
+- **Teste oco não prova:** se o teste continuaria passando com a função devolvendo vazio, zero ou nada, reescreva-o para afirmar o resultado que o usuário veria.
+- **Teste honesto impraticável** (efeito externo sem fronteira, ambiente ausente): não escreva um teste ruim; registre o que não foi provado e por quê.
 - Guarde a saída do teste falhando (RED) no arquivo da tarefa. Se a infraestrutura de teste ainda não existe, o RED é o primeiro teste que roda: diga isso.
 
 ## 4. Implementar
 - O mínimo para o teste passar, imitando o exemplo de referência; depois refatore com os testes verdes.
 - Um passo do plano por vez. Ao concluir um passo, marque-o no arquivo da tarefa com o comando que o verificou. Sugira um commit por passo verificado (Conventional Commits, escopo = módulo); commite só se o dev pedir.
 - Ação de "Perguntar antes" que surgir no meio: pare, pergunte, siga com o resto.
+- **Disjuntor:** duas correções seguidas falharam na mesma verificação? Não tente a terceira. Escreva numa frase a premissa que as duas compartilham (ex.: "o valor chega já validado"), confira-a no código ou com um teste e replaneje a partir do que achar. Premissa que é regra de negócio vira pergunta ao dev.
 
 ## 5. Verificar
 Do mais rápido ao completo: o teste do arquivo → o teste de integração da fatia → o comando de verificação completa do projeto (`CMD_CHECK` no `AGENTS.md`) → **rodar o sistema como o usuário usa**, pela linha da funcionalidade em `docs/VERIFICACAO.md` (sem a linha, crie-a), quando a mudança é visível ao usuário.

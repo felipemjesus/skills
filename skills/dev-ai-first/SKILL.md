@@ -7,7 +7,7 @@ metadata:
   author: Felipe Martins
   github: https://github.com/felipemjesus
   repository: https://github.com/felipemjesus/skills
-  version: "3.1.0"
+  version: "3.2.0"
 ---
 
 # dev-ai-first

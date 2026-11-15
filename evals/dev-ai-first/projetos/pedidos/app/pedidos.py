@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Optional
 
 from app.dinheiro import formatar
@@ -10,6 +11,7 @@ class Cupom:
     codigo: str
     tipo: str  # "percentual" ou "fixo"
     valor: int  # percentual: 0 a 100; fixo: centavos
+    validade: Optional[date] = None  # último dia em que o cupom vale; None = sem validade
 
 
 @dataclass
@@ -30,7 +32,8 @@ def subtotal(pedido: Pedido) -> int:
     return sum(i.quantidade * i.preco_unitario for i in pedido.itens)
 
 
-def total(pedido: Pedido) -> int:
+def total(pedido: Pedido, hoje: Optional[date] = None) -> int:
+    hoje = hoje or date.today()
     bruto = subtotal(pedido)
     cupom = pedido.cupom
     if cupom is None:

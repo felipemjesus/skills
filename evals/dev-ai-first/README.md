@@ -4,7 +4,7 @@ Avaliação no formato do [agentskills.io](https://agentskills.io/skill-creation
 
 | Arquivo | O que é |
 |---|---|
-| `evals.json` | 3 casos (preparar com código, preparar projeto governado, entregar um bug), cada um com asserções conferidas por script |
+| `evals.json` | 5 casos (preparar com código, preparar projeto governado, corrigir um bug, validade do cupom, recusa de quantidade), cada um com asserções conferidas por script; a do teste oco roda os testes novos contra mutantes |
 | `projetos/pedidos/` | projeto sintético em Python, só biblioteca padrão; tem um bug conhecido e um trecho duplicado fora do escopo |
 | `projetos/governado/` | camada sobre `pedidos/` com um `AGENTS.md` do time |
 | `rodar.py` | roda cada caso com e sem a skill (`claude -p`), confere as asserções e grava `benchmark.json` (acerto, tokens e tempo, com o delta) |
@@ -20,7 +20,7 @@ python3 -I evals/dev-ai-first/rodar.py --saida ../evals-saida/iteracao-1
 python3 -I evals/dev-ai-first/ativacao.py --saida ../evals-saida/ativacao-1
 ```
 
-`rodar.py --so-conferir` refaz só as asserções. Para comparar versões da skill, rode a mesma iteração antes e depois e compare os `benchmark.json`.
+`--execucoes 2` repete cada caso para reduzir o ruído; `--bracos com` mede só a skill (o braço sem ela não muda entre versões). `rodar.py --so-conferir` refaz só as asserções. Para comparar versões da skill, rode a mesma iteração antes e depois e compare os `benchmark.json`.
 
 ## Regras
 

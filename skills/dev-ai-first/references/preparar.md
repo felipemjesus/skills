@@ -43,7 +43,7 @@ Documentos longos (ARCHITECTURE, CODEBASE_MAP, CODING_GUIDELINES, TESTING...) s�
 6. **Preencha o `docs/VERIFICACAO.md`** com de 5 a 10 funcionalidades principais: como chegar e o que observar. O que você rodou fica "verificado"; o resto, "não verificado".
 7. **Segunda rodada de perguntas, se a leitura levantou decisões:** qual de duas formas convivendo imitar, o que fazer com um segredo encontrado, o que é dado de outro sistema. Mesma regra: numeradas, com recomendação; dev indisponível, siga a recomendação e registre.
 8. **Preencha o `docs/IA_FIRST.md`.** É o produto principal do preparar:
-   - a verificação executável: o que existe e o que falta;
+   - a verificação executável: o que existe e o que falta. Com testes e cobertura já rodando, sugira o gate no diff (item 9) com o comando e o limite da ferramenta da stack; não instale, proponha como demanda;
    - onde o atalho não é o caminho certo (duas formas convivendo, dado com vários escritores, tipo de operação sem exemplo bom, regra que só a revisão garante);
    - segredos versionados: arquivo e linha, nunca o valor;
    - as próximas demandas em ordem de prioridade.

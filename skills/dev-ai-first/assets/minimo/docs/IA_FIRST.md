@@ -20,6 +20,7 @@ O agente só prova que terminou se conseguir rodar o sistema e os testes.
 | 6 | Verificação de tipos | | | |
 | 7 | CI roda a verificação em todo PR/MR | | | |
 | 8 | Mapa de verificação ([VERIFICACAO.md](VERIFICACAO.md)) com as funcionalidades principais | | | |
+| 9 | Gate de qualidade só no diff (cobertura das linhas alteradas, complexidade por função, teste de mutação dos alterados), com a ferramenta da stack: comando e limite | | | |
 
 ## Arquitetura amigável para agentes
 
