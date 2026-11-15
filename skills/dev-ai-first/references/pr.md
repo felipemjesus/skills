@@ -13,8 +13,8 @@ Preencha o modelo do projeto; sem modelo, use:
 
 - **O quê:** 1 a 3 frases.
 - **Por quê:** a issue e o contexto que o código não mostra.
-- **Como foi verificado:** comandos rodados; o que foi observado; a saída do RED (teste falhando pelo motivo certo antes da implementação); por último, o que não foi verificado e por quê.
-- **Impacto, riscos e rollback:** dados e migrações, contratos públicos (endpoints, eventos, API de módulo), compatibilidade, como desfazer.
+- **Como foi verificado:** antes e depois: a saída do RED (teste falhando pelo motivo certo antes da implementação) e a saída verde; comandos rodados e o que foi observado; em bug, a hipótese que se confirmou; por último, o que não foi verificado e por quê. "Testes verdes" sozinho é afirmação, não evidência.
+- **Impacto, riscos e rollback:** primeira linha: porta de **mão única** ou **mão dupla** (dá para desfazer só com revert?) e raio de impacto em uma palavra (local, módulo, sistema, externo); migração, envio externo e deleção de dado são sempre mão única. Depois: dados e migrações, contratos públicos (endpoints, eventos, API de módulo), compatibilidade, como desfazer.
 - **Checklist de design:** as respostas, uma linha cada.
 - **Perguntar antes:** cada item do diff que exigia autorização (dependência, migração, contrato, configuração), com a autorização citada literalmente (a frase da demanda que o exige, a resposta do dev, ou a linha de "Decisões registradas" do `AGENTS.md`).
 - **Feito com agente de IA:** sim.

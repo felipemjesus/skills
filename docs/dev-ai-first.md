@@ -269,10 +269,38 @@ O [ub-mode](https://github.com/unclebob/ub-mode), de Robert C. Martin, é uma sk
 - **Onde o agente puro falhou:** alterou o `AGENTS.md` do time nas 2 execuções do projeto governado, e numa execução do projeto com código passou do tamanho.
 - **Casos ainda fáceis:** os casos de entrega continuam não separando os braços. Um modelo atual já escreve teste bom num projeto pequeno e limpo. Para medir o disjuntor e o teste oco, os casos precisam de um ambiente que engane: uma premissa falsa no código ou um teste existente que mente.
 
+### 8. Ideias do Matt Pocock (14/11)
+
+O [aihero.dev](https://www.aihero.dev) e o [mattpocock/skills](https://github.com/mattpocock/skills) defendem quase o mesmo que as rodadas mediram: o código influencia mais que o prompt, o AGENTS.md é mínimo, os checks são determinísticos e os passos são verticais e provados. Entrou o que faltava:
+
+- **Revisão com veredito por eixo:** um para Demanda, outro para Padrões, para um eixo que passa não esconder o que falha. Em demanda grande, um revisor por eixo. O revisor não chama a skill nem cria subagentes; o repositório do Matt registrou uma recursão com mais de 50 agentes.
+- **PR com porta de mão única ou dupla e raio de impacto,** evidência antes e depois, e, em bug, a hipótese que se confirmou.
+- **Valor esperado de fonte independente,** para pegar o teste que repete a fórmula do código.
+- **Bug:**
+  - começa por um comando que já mostra o sintoma;
+  - se não há onde testar com honestidade, isso vira achado.
+- **Demanda média:** o plano diz onde cada critério será testado.
+- **Armadilhas reescritas no positivo,** com a ação certa na frente. O Matt alerta que a proibição puxa o comportamento proibido para o contexto.
+- **Modo `retro`, chamado pelo dev:**
+  - lê a sessão e propõe mudanças no ambiente;
+  - cada item tem um destino: o que é mecânico vira check, julgamento repetido vira regra, busca demorada vira ponteiro, linha inútil sai do AGENTS.md.
+
+**Experimento: onde ficam as regras inegociáveis.** O Matt põe regras de julgamento num arquivo lido pelo revisor, fora do AGENTS.md. Montei um caso com uma regra do time que o código não mostra (auditar todo desconto novo), em duas variantes: a regra no `AGENTS.md` ou só no documento de padrões da revisão. Nas 8 execuções (2 variantes × com e sem skill × 2), a regra foi seguida em todas. Num projeto pequeno o agente lê tudo, então o lugar não decidiu. A variante do revisor também não custou menos, e as regras ficam no `AGENTS.md`. O teste que decidiria é num projeto grande, onde o agente não lê tudo.
+
+**Reteste:** 6 casos, 2 execuções.
+
+| Comparação | Acerto | Tokens | Custo (US$) |
+|---|---|---|---|
+| 3.2.0 × 3.3.0, janelas de tempo diferentes | 100% · 100% | +15,4% | +6,4% |
+| **3.2.0 × 3.3.0, pareado na mesma janela** | **100% · 100%** | **−8,6%** | **−1,4%** |
+
+A diferença entre as duas linhas é a lição de método: **a mesma versão variou cerca de 20% em tokens entre janelas de tempo.** Quase tudo era leitura de cache, que custa pouco. Comparação de custo agora é sempre pareada ([avaliacao.md](avaliacao.md)).
+
 ## Próximos passos
 
 - Kit `aplicacao-de-ia` (prompts versionados, evals, guardrails) como modo opcional, para produtos com LLM.
 - Kits prontos de TypeScript e PHP como referência quando a stack bate.
 - `sincronizar`: apontar a documentação que o diff deixou desatualizada, no CI.
 - Repetir a avaliação A/B com mais projetos e demandas maiores, e com juiz de outro fabricante de modelo.
+- Repetir o experimento "regra no AGENTS.md × no revisor" num projeto grande, onde o agente não lê tudo.
 - Evals sintéticos que discriminem a skill: premissa falsa plantada no código (para o disjuntor), teste existente que mente, decisão que exige pergunta, configuração quebrada fora do pedido.

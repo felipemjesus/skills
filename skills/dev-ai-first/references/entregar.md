@@ -34,7 +34,7 @@ As regras do projeto estão no `AGENTS.md` dele e nos documentos que ele aponta.
    | Tamanho | Sinal | Plano | Revisão independente |
    |---|---|---|---|
    | pequena | até ~3 arquivos, um comportamento, padrão vizinho claro | critérios + checklist só dos itens que se aplicam, em poucas linhas | só se houver risco (passo 6) |
-   | média | vários comportamentos ou camadas | checklist + plano "passo → como verificar", cada passo uma fatia completa | sim |
+   | média | vários comportamentos ou camadas | checklist + plano "passo → como verificar", cada passo uma fatia completa; onde cada critério será testado (o ponto mais alto que pegue o comportamento, de preferência um só) e o que esse teste deixa passar | sim |
    | grande | decisão de arquitetura, várias semanas, contrato novo | design doc em `docs/design-docs/` com 2 ou 3 alternativas e uma recomendação | sim |
 2. **Responda o checklist de design** do projeto (`docs/CHECKLIST_DESIGN.md`, se existir; senão, confira o plano contra `docs/PRINCIPIOS.md`), no arquivo da tarefa:
    - **fato** (quem chama, onde está o teste, qual transição existe): você responde, com `arquivo:linha`;
@@ -47,8 +47,8 @@ Demanda pequena e sem decisão: mostre o checklist e o plano em poucas linhas e 
 
 ## 3. Teste primeiro
 - Todo comportamento novo começa por um teste que **falha pelo motivo certo**: unitário no domínio e integração no caso de uso, conforme o `TESTING.md` do projeto.
-- **Bug:** o teste reproduz o sintoma exato relatado; hipóteses ordenadas antes de instrumentar; depois procure a mesma causa nos outros pontos que usam o conceito (`TESTING.md` §9 do projeto). Não reproduziu? Isso é o achado: relate e pergunte o dado que falta.
-- **Teste oco não prova:** se o teste continuaria passando com a função devolvendo vazio, zero ou nada, reescreva-o para afirmar o resultado que o usuário veria.
+- **Bug:** antes de qualquer hipótese, um comando que já rodou e mostra o sintoma (rápido, determinístico, que você roda sozinho); o teste reproduz o sintoma exato relatado; hipóteses ordenadas antes de instrumentar; a que se confirmar vai para o arquivo da tarefa e para o PR; depois procure a mesma causa nos outros pontos que usam o conceito (`TESTING.md` §9 do projeto). Não reproduziu? Isso é o achado: relate e pergunte o dado que falta. Não há ponto do código onde um teste honesto pegue o bug? Também é achado: registre no `docs/IA_FIRST.md`.
+- **Teste oco não prova:** se o teste continuaria passando com a função devolvendo vazio, zero ou nada, reescreva-o para afirmar o resultado que o usuário veria. O valor esperado vem de fora do código testado (a demanda, um exemplo calculado à mão, um literal conhecido), nunca da mesma fórmula da implementação.
 - **Teste honesto impraticável** (efeito externo sem fronteira, ambiente ausente): não escreva um teste ruim; registre o que não foi provado e por quê.
 - Guarde a saída do teste falhando (RED) no arquivo da tarefa. Se a infraestrutura de teste ainda não existe, o RED é o primeiro teste que roda: diga isso.
 

@@ -45,3 +45,4 @@ Uma mudança na skill só entra se uma avaliação mostrar **custo menor ou igua
 - **Quem constrói não escreve as instruções de quem avalia:** o roteiro do subagente é o mesmo em todas as rodadas.
 - **Uma rodada mede uma coisa:** não mude o roteiro e a skill ao mesmo tempo.
 - **Número sem amostra é anedota:** com 3 projetos, diferenças pequenas (menos de 10%) não contam.
+- **Custo se compara pareado:** a mesma versão variou cerca de 20% em tokens entre janelas de tempo diferentes. Rode as duas versões na mesma janela e olhe também o custo em dólar: leitura de cache domina os tokens e custa pouco.

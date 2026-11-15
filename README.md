@@ -51,9 +51,9 @@ Skills são instruções estruturadas que dão ao agente experiência num domín
 Torna o repositório **IA first** e conduz as entregas do dev com agentes de código, **com qualidade**.
 
 - **Preparar:** num projeto existente, roda o que o projeto tem e gera um `AGENTS.md` enxuto (comandos, regras inegociáveis, armadilhas, pronto), os princípios de arquitetura e de código como texto fixo, um mapa de verificação e um plano para o projeto ficar agent-friendly. Numa pasta vazia, entrevista o dev e o kit completo propõe a estrutura. Detecta o perfil (backend, frontend, fullstack) e respeita instruções que o projeto já tenha.
-- **Entregar:** conduz cada demanda na medida do tamanho: critérios, exemplo de referência, teste primeiro observado, verificação rodando o sistema, revisão por subagente independente quando há risco, descrição do PR.
-- **Avaliada às cegas** contra o agente puro em projetos reais: veja a seção 5 de [docs/dev-ai-first.md](docs/dev-ai-first.md).
-- **Atalhos:** `retomar`, `revisar` e `pr`.
+- **Entregar:** conduz cada demanda na medida do tamanho: critérios, exemplo de referência, teste primeiro observado (sem teste oco), verificação rodando o sistema, revisão por subagente independente quando há risco (com veredito separado para a demanda e para os padrões), descrição do PR com evidência antes e depois e risco de merge.
+- **Avaliada** às cegas contra o agente puro em projetos reais, e a cada versão com evals sintéticos ([evals/dev-ai-first](evals/dev-ai-first/README.md)): veja as seções 5 a 8 de [docs/dev-ai-first.md](docs/dev-ai-first.md).
+- **Atalhos:** `retomar`, `revisar`, `pr` e `retro` (propõe melhorias no ambiente do agente a partir da sessão).
 
 ```text
 /dev-ai-first preparar

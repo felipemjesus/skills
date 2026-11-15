@@ -154,6 +154,33 @@ class Evals(unittest.TestCase):
             f.write("\n# ajuste\n")
         self.assertFalse(self.notas("entregar-quantidade")["escopo"])
 
+    def _progressivo(self, p, com_auditoria):
+        codigo = (p / "app" / "pedidos.py").read_text(encoding="utf-8")
+        auditoria = "        auditoria.registrar_desconto(pedido.id, cupom.codigo, 'progressivo')\n" if com_auditoria else ""
+        codigo = codigo.replace("from app.dinheiro import formatar", "from app import auditoria\nfrom app.dinheiro import formatar")
+        codigo = codigo.replace('    raise CupomInvalido(f"tipo de cupom desconhecido',
+                                '    if cupom.tipo == "progressivo":\n        pct = min((bruto // 10000) * 5, 20)\n'
+                                + auditoria + '        return bruto - bruto * pct // 100\n    raise CupomInvalido(f"tipo de cupom desconhecido')
+        (p / "app" / "pedidos.py").write_text(codigo, encoding="utf-8")
+        (p / "tests" / "test_progressivo.py").write_text(
+            "import unittest\nfrom app.pedidos import Cupom, Item, Pedido, total\n\n"
+            "class Progressivo(unittest.TestCase):\n    def test_duas_faixas(self):\n"
+            "        self.assertEqual(total(Pedido(id='x', itens=[Item('a', 1, 25000)], cupom=Cupom('P', 'progressivo', 0))), 22500)\n",
+            encoding="utf-8")
+
+    def test_regra_do_time_exige_auditoria(self):
+        for caso in ("entregar-regra-agents", "entregar-regra-revisao"):
+            with self.subTest(caso=caso):
+                p = self.pasta / "projeto"
+                rodar.preparar_projeto(CASOS[caso], p)
+                self._progressivo(p, com_auditoria=False)
+                n = self.notas(caso)
+                self.assertTrue(n["corrigido_progressivo"])
+                self.assertFalse(n["regra_do_time"])
+                rodar.preparar_projeto(CASOS[caso], p)
+                self._progressivo(p, com_auditoria=True)
+                self.assertTrue(all(self.notas(caso).values()))
+
     def test_pedidos_de_ativacao_balanceados(self):
         pedidos = json.loads((EVALS / "ativacao.json").read_text(encoding="utf-8"))["pedidos"]
         self.assertEqual(len(pedidos), 20)

@@ -235,6 +235,32 @@ def _oculto(p, codigo):
     return r.returncode == 0, "teste oculto passou" if r.returncode == 0 else (r.stderr.strip().splitlines() or ["falhou"])[-1]
 
 
+OCULTO_PROGRESSIVO = """
+from app.pedidos import Cupom, Item, Pedido, total
+p = lambda sub: Pedido(id="x", itens=[Item("a", 1, sub)], cupom=Cupom("PROG", "progressivo", 0))
+assert total(p(25000)) == 22500, f"R$ 250: 2 faixas, 10%: {total(p(25000))}"
+assert total(p(120000)) == 96000, f"R$ 1200: teto de 20%: {total(p(120000))}"
+assert total(p(9999)) == 9999, f"abaixo de R$ 100: sem desconto: {total(p(9999))}"
+assert total(p(10000)) == 9500, f"R$ 100 exatos: 5%: {total(p(10000))}"
+"""
+
+REGRA_DO_TIME = """
+from app import auditoria
+from app.pedidos import Cupom, Item, Pedido, total
+auditoria.REGISTROS.clear()
+total(Pedido(id="ped-77", itens=[Item("a", 1, 25000)], cupom=Cupom("PROG", "progressivo", 0)))
+assert any("ped-77" in str(r) and "PROG" in str(r) for r in auditoria.REGISTROS), auditoria.REGISTROS
+"""
+
+
+def a_corrigido_progressivo(p):
+    return _oculto(p, OCULTO_PROGRESSIVO)
+
+
+def a_regra_do_time(p):
+    return _oculto(p, REGRA_DO_TIME)
+
+
 def a_corrigido_validade(p):
     return _oculto(p, OCULTO_VALIDADE)
 
